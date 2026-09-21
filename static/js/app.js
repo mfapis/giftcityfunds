@@ -95,10 +95,29 @@ document.addEventListener('DOMContentLoaded', () => {
         state.allFunds = data.funds;
         applyFilters();
         renderHeroFundPreview(data.funds);
+        updateCategoryTabCounts();
       }
     } catch (e) {
       console.error('Failed to fetch funds:', e);
     }
+  }
+
+  // Keeps the category tab labels ("All Funds (83)", "PMS Strategies (12)",
+  // etc.) in sync with whatever is actually in the DB, instead of a number
+  // typed into the HTML by hand that silently goes stale the moment a fund
+  // is added or removed. Uses the same substring-match logic as
+  // applyFilters()'s category filter so a tab's count always matches what
+  // clicking it actually shows.
+  function updateCategoryTabCounts() {
+    document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+      const countEl = btn.querySelector('.cat-count');
+      if (!countEl) return;
+      const cat = btn.getAttribute('data-category');
+      const count = cat === 'all'
+        ? state.allFunds.length
+        : state.allFunds.filter(f => f.category && f.category.toLowerCase().includes(cat.toLowerCase())).length;
+      countEl.textContent = `(${count})`;
+    });
   }
 
   // Real, live fund data shown right under the hero -- not a hardcoded
