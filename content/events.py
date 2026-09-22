@@ -14,6 +14,11 @@ EVENTS = [
         "organizer": "MFAPIs",
         "speakers": "Akshay Falgunia (Fund Manager, PPFAS GIFT Fund) and Hema Thakkar (Head, Business Development -- Alternatives)",
         "date_display": "Fri, 18 Sep 2026",
+        # ISO date the event actually falls on, used to split events.py's
+        # listing into Live vs Past -- keep this in sync with date_display
+        # whenever the event's date changes. Time-of-day isn't tracked, so
+        # an event is treated as "past" starting the day after it happens.
+        "date_iso": "2026-09-18",
         "time_display": "4:00 -- 5:00 PM IST",
         "format_display": "Online",
         "card_description": "PPFAS GIFT Fund's Akshay Falgunia and Hema Thakkar unpack the alternative investments landscape in GIFT City -- strategy, portfolio construction, and where the space is headed.",

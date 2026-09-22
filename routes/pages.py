@@ -136,8 +136,30 @@ def fund_detail_page(fund_id: int, slug: Optional[str] = None):
 def events_index():
     """Lists GIFT City AMC events (webinars, sessions) MFAPIs organizes.
     Registration for each event happens on its own registration page
-    (Luma, etc.), linked from here and from each event's own page."""
-    return render_template("events.html", events=EVENTS)
+    (Luma, etc.), linked from here and from each event's own page.
+
+    Split into Live (today or upcoming) and Past (already happened) --
+    computed from each event's date_iso against today's date, not
+    hand-maintained, so an event moves itself into Past the day after it
+    happens without anyone needing to edit content/events.py again."""
+    today = datetime.now().date()
+    live_events, past_events = [], []
+    for e in EVENTS:
+        event_date = datetime.strptime(e["date_iso"], "%Y-%m-%d").date()
+        (live_events if event_date >= today else past_events).append(e)
+    live_events.sort(key=lambda e: e["date_iso"])
+    past_events.sort(key=lambda e: e["date_iso"], reverse=True)
+    # Land visitors on whichever tab actually has something to show --
+    # defaulting to "Live" when there are none yet would just greet them
+    # with an empty state instead of the past sessions that do exist.
+    default_tab = "live" if live_events else "past"
+    return render_template(
+        "events.html",
+        events=EVENTS,
+        live_events=live_events,
+        past_events=past_events,
+        default_tab=default_tab,
+    )
 
 
 @pages_bp.route("/events/<slug>")

@@ -94,38 +94,67 @@
   <main class="flex-1 px-4 md:px-8 pb-16">
     <div class="max-w-3xl mx-auto">
 
-      <div class="flex items-center gap-2 mb-6">
-        <span class="text-xs font-bold px-3.5 py-1.5 rounded-full border border-blue-500 bg-blue-500 text-white">All Events</span>
+      <!-- Live / Past tabs -->
+      <div class="flex items-center gap-2 mb-6" id="eventsTabBar">
+        <button type="button" class="events-tab-btn{% if default_tab == 'live' %} active{% endif %} text-xs font-bold px-3.5 py-1.5 rounded-full border transition-colors {% if default_tab == 'live' %}border-blue-500 bg-blue-500 text-white{% else %}border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:border-blue-500/30{% endif %}" data-tab="live">
+          Live Events <span class="opacity-80">({{ live_events|length }})</span>
+        </button>
+        <button type="button" class="events-tab-btn{% if default_tab == 'past' %} active{% endif %} text-xs font-bold px-3.5 py-1.5 rounded-full border transition-colors {% if default_tab == 'past' %}border-blue-500 bg-blue-500 text-white{% else %}border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:border-blue-500/30{% endif %}" data-tab="past">
+          Past Events <span class="opacity-80">({{ past_events|length }})</span>
+        </button>
       </div>
 
-      <div class="space-y-4">
-        {% for e in events %}
-        <div class="glass-card rounded-2xl overflow-hidden sm:flex">
-          <div class="relative w-full sm:w-40 shrink-0 aspect-[2/3] bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden">
-            <img src="{{ url_for('static', filename=e.cover) }}" alt="" class="absolute inset-0 w-full h-full object-cover">
-            <span class="absolute bottom-3 right-3 text-[9px] font-black tracking-widest text-white/70 uppercase drop-shadow">{{ e.format_display }}</span>
+      {% macro event_card(e, is_past) %}
+      <div class="glass-card rounded-2xl overflow-hidden sm:flex{% if is_past %} opacity-80{% endif %}">
+        <div class="relative w-full sm:w-40 shrink-0 aspect-[2/3] bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden">
+          <img src="{{ url_for('static', filename=e.cover) }}" alt="" class="absolute inset-0 w-full h-full object-cover{% if is_past %} grayscale{% endif %}">
+          <span class="absolute bottom-3 right-3 text-[9px] font-black tracking-widest text-white/70 uppercase drop-shadow">{{ e.format_display }}</span>
+        </div>
+        <div class="p-5 flex-1 min-w-0">
+          <span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-500 border border-blue-500/25">{{ e.badge }}</span>
+          {% if is_past %}
+          <span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-[var(--color-text-subtle)]/10 text-[var(--color-text-subtle)] border border-[var(--color-border)] ml-1">Completed</span>
+          {% endif %}
+          <h2 class="text-lg font-bold text-[var(--color-text)] leading-snug mt-2 mb-1.5">{{ e.title }}</h2>
+          <p class="text-xs text-[var(--color-text-muted)] leading-relaxed mb-3">{{ e.card_description }}</p>
+          <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-[var(--color-text-subtle)] mb-4">
+            <span><span class="font-bold text-[var(--color-text-muted)]">Organized by</span> · {{ e.organizer }}</span>
+            <span><span class="font-bold text-[var(--color-text-muted)]">Date</span> · {{ e.date_display }}, {{ e.time_display }}</span>
           </div>
-          <div class="p-5 flex-1 min-w-0">
-            <span class="text-[9px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-500 border border-blue-500/25">{{ e.badge }}</span>
-            <h2 class="text-lg font-bold text-[var(--color-text)] leading-snug mt-2 mb-1.5">{{ e.title }}</h2>
-            <p class="text-xs text-[var(--color-text-muted)] leading-relaxed mb-3">{{ e.card_description }}</p>
-            <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-[var(--color-text-subtle)] mb-4">
-              <span><span class="font-bold text-[var(--color-text-muted)]">Organized by</span> · {{ e.organizer }}</span>
-              <span><span class="font-bold text-[var(--color-text-muted)]">Date</span> · {{ e.date_display }}, {{ e.time_display }}</span>
-            </div>
-            <div class="flex items-center gap-3">
-              {% if e.luma_event_id %}
-              <a href="https://luma.com/event/{{ e.luma_event_id }}" data-luma-action="checkout" data-luma-event-id="{{ e.luma_event_id }}" onclick="window.gaTrack && window.gaTrack('Invest / Visit AMC', {event_slug: '{{ e.slug }}'})" class="luma-checkout--button inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors">Register</a>
-              {% else %}
-              <a href="{{ e.register_url }}" target="_blank" rel="noopener noreferrer" onclick="window.gaTrack && window.gaTrack('Invest / Visit AMC', {event_slug: '{{ e.slug }}'})" class="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors">Register</a>
-              {% endif %}
-              <a href="{{ url_for('pages.event_detail', slug=e.slug) }}" class="text-xs font-bold text-blue-500 hover:underline">See Details</a>
-              <button type="button" class="event-share-btn ml-auto inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border)] text-[var(--color-text-subtle)] hover:text-blue-500 hover:border-blue-500/40 transition-colors" data-event-title="{{ e.title }}" data-event-url="{{ url_for('pages.event_detail', slug=e.slug, _external=True) }}" aria-label="Share this event">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342a3 3 0 100-2.684m0 2.684a3 3 0 100 2.684m0-2.684l6.632 3.316m0-9.316a3 3 0 105.368 2.658 3 3 0 00-5.368-2.658zm0 9.316a3 3 0 105.368-2.658 3 3 0 00-5.368 2.658zm0-9.316L8.684 10.658"></path></svg>
-              </button>
-            </div>
-            <p class="event-share-feedback hidden text-[10px] font-semibold text-emerald-500 mt-2"></p>
+          <div class="flex items-center gap-3">
+            {% if is_past %}
+            <span class="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold text-[var(--color-text-subtle)] bg-[var(--color-bg-subtle)] border border-[var(--color-border)] cursor-default">Event Completed</span>
+            {% elif e.luma_event_id %}
+            <a href="https://luma.com/event/{{ e.luma_event_id }}" data-luma-action="checkout" data-luma-event-id="{{ e.luma_event_id }}" onclick="window.gaTrack && window.gaTrack('Invest / Visit AMC', {event_slug: '{{ e.slug }}'})" class="luma-checkout--button inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors">Register</a>
+            {% else %}
+            <a href="{{ e.register_url }}" target="_blank" rel="noopener noreferrer" onclick="window.gaTrack && window.gaTrack('Invest / Visit AMC', {event_slug: '{{ e.slug }}'})" class="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors">Register</a>
+            {% endif %}
+            <a href="{{ url_for('pages.event_detail', slug=e.slug) }}" class="text-xs font-bold text-blue-500 hover:underline">See Details</a>
+            <button type="button" class="event-share-btn ml-auto inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border)] text-[var(--color-text-subtle)] hover:text-blue-500 hover:border-blue-500/40 transition-colors" data-event-title="{{ e.title }}" data-event-url="{{ url_for('pages.event_detail', slug=e.slug, _external=True) }}" aria-label="Share this event">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342a3 3 0 100-2.684m0 2.684a3 3 0 100 2.684m0-2.684l6.632 3.316m0-9.316a3 3 0 105.368 2.658 3 3 0 00-5.368-2.658zm0 9.316a3 3 0 105.368-2.658 3 3 0 00-5.368 2.658zm0-9.316L8.684 10.658"></path></svg>
+            </button>
           </div>
+          <p class="event-share-feedback hidden text-[10px] font-semibold text-emerald-500 mt-2"></p>
+        </div>
+      </div>
+      {% endmacro %}
+
+      <div id="eventsPanel-live" class="events-panel space-y-4{% if default_tab != 'live' %} hidden{% endif %}">
+        {% for e in live_events %}
+          {{ event_card(e, false) }}
+        {% else %}
+        <div class="glass-card rounded-2xl p-8 text-center text-xs text-[var(--color-text-subtle)]">
+          No live or upcoming events right now -- check back soon, or see what we've hosted before under Past Events.
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="eventsPanel-past" class="events-panel space-y-4{% if default_tab != 'past' %} hidden{% endif %}">
+        {% for e in past_events %}
+          {{ event_card(e, true) }}
+        {% else %}
+        <div class="glass-card rounded-2xl p-8 text-center text-xs text-[var(--color-text-subtle)]">
+          No past events yet.
         </div>
         {% endfor %}
       </div>
@@ -142,6 +171,29 @@
       <a href="/" class="font-bold text-blue-400 hover:underline">← Back to Full Dashboard</a>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      document.querySelectorAll('.events-tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var tab = btn.getAttribute('data-tab');
+          document.querySelectorAll('.events-tab-btn').forEach(function (b) {
+            var isActive = b === btn;
+            b.classList.toggle('active', isActive);
+            b.classList.toggle('border-blue-500', isActive);
+            b.classList.toggle('bg-blue-500', isActive);
+            b.classList.toggle('text-white', isActive);
+            b.classList.toggle('border-[var(--color-border)]', !isActive);
+            b.classList.toggle('bg-[var(--color-card)]', !isActive);
+            b.classList.toggle('text-[var(--color-text-muted)]', !isActive);
+          });
+          document.getElementById('eventsPanel-live').classList.toggle('hidden', tab !== 'live');
+          document.getElementById('eventsPanel-past').classList.toggle('hidden', tab !== 'past');
+          if (window.gaTrack) window.gaTrack('Filter Used', { filter: 'events_tab', value: tab });
+        });
+      });
+    })();
+  </script>
 
   <script>
     (function () {
