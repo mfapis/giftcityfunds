@@ -875,6 +875,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!data.success) return;
 
       const f = data.fund;
+      const logoBox = document.getElementById('fundHeaderLogo');
+      if (logoBox && window.AmcLogo) { await window.AmcLogo.ready; logoBox.innerHTML = window.AmcLogo.html(f.amc_name, 64); }
       state.currentModalFund = { id: f.fund_id, name: f.fund_name, nav: f.nav, currency: f.nav_currency || 'USD' };
       document.title = `${f.fund_name} | GIFT360`;
       setupBuyPanel(f);

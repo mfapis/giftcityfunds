@@ -52,6 +52,16 @@
     return Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - months, end.getUTCDate());
   }
 
+  // Soft fade under each line: the line's colour at the top, clear at the baseline.
+  function areaFill(context, colour, lines) {
+    const { ctx, chartArea } = context.chart;
+    if (!chartArea) return colour + '22';
+    const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+    g.addColorStop(0, colour + '55');
+    g.addColorStop(1, colour + '00');
+    return g;
+  }
+
   function render(opts) {
     const { canvas, legend, note, history, range = 'ALL', isLight = true, currency = 'USD' } = opts;
     if (!canvas) return false;
@@ -113,9 +123,9 @@
       type: 'line',
       data: {
         datasets: visible.map((s) => ({
-          label: s.label, data: s.points, parsing: false, borderColor: s.colour, backgroundColor: s.colour + '14',
+          label: s.label, data: s.points, parsing: false, borderColor: s.colour, backgroundColor: (ctx) => areaFill(ctx, s.colour, visible.length),
           borderWidth: /regular/i.test(s.label) ? 2 : 2.75, borderDash: /regular/i.test(s.label) ? [7, 4] : [], pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, tension: 0.25,
-          fill: visible.length === 1, spanGaps: true,
+          fill: s === visible[0] ? 'origin' : false, spanGaps: true,
         })),
       },
       options: {
