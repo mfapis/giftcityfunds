@@ -10,7 +10,7 @@
 (function () {
   const COLORS = { direct: '#38bdf8', regular: '#f59e0b' };   // Direct keeps the cyan-blue the NAV line always had
   const EXTRA = ['#10b981', '#e11d48', '#7c3aed', '#0891b2', '#64748b', '#d946ef'];
-  const hidden = new Set();                 // labels the viewer switched off; kept across range changes
+  let selected = null;                      // share class being viewed; kept across range changes
   let chart = null;
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -77,27 +77,28 @@
       label: s.label, colour: colourFor(s.label, i - 2), full: s.points,
       points: s.points.filter((p) => p.x >= from),
     }));
-    const visible = shown.filter((s) => !hidden.has(s.label) && s.points.length);
+    // One share class at a time, picked with the Plan switch (Direct is first when the fund has it).
+    const chosen = shown.find((s) => s.label === selected) || shown[0];
+    const visible = chosen.points.length ? [chosen] : [];
 
     const rangeName = range === 'ALL' ? 'since launch' : range === 'YTD' ? 'year to date' : `over ${range}`;
     if (legend) {
-      legend.innerHTML = shown.map((s) => {
-        const p = s.points;
-        const change = p.length > 1 ? (p[p.length - 1].y / p[0].y - 1) * 100 : null;
-        const off = hidden.has(s.label);
-        const changeHtml = change === null ? '' : `<b style="color:${change >= 0 ? '#059669' : '#dc2626'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</b> <span class="nav-legend-sub">${rangeName}</span>`;
-        return `<button type="button" class="nav-legend-chip ${off ? 'is-off' : ''}" data-class="${esc(s.label)}" title="Click to ${off ? 'show' : 'hide'} ${esc(s.label)}">
-            <span class="nav-legend-dot" style="background:${s.colour}"></span><span class="nav-legend-name">${esc(s.label)}</span>${changeHtml}</button>`;
-      }).join('');
-      legend.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
-        const l = b.getAttribute('data-class');
-        if (hidden.has(l)) hidden.delete(l); else if (visible.length > 1 || !visible.some((v) => v.label === l)) hidden.add(l);
+      const p = chosen.points;
+      const change = p.length > 1 ? (p[p.length - 1].y / p[0].y - 1) * 100 : null;
+      const stat = change === null ? '' : `<span class="nav-legend-stat"><b style="color:${change >= 0 ? '#059669' : '#dc2626'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</b> <span class="nav-legend-sub">${rangeName}</span></span>`;
+      const picker = shown.length > 1
+        ? `<span class="nav-legend-sub" style="font-weight:700">Plan</span><span class="nav-plan-switch">${shown.map((s) => `<button type="button" class="nav-plan-btn ${s === chosen ? 'is-active' : ''}" data-class="${esc(s.label)}">${esc(s.label)}</button>`).join('')}</span>`
+        : `<span class="nav-legend-name">${esc(chosen.label)}</span>`;
+      legend.innerHTML = picker + stat;
+      legend.querySelectorAll('.nav-plan-btn').forEach((b) => b.addEventListener('click', () => {
+        selected = b.getAttribute('data-class');
         render(opts);
       }));
     }
 
     if (note) {
-      note.textContent = shown.map((s) => `${s.label}: ${s.points.length} daily NAV${s.points.length === 1 ? '' : 's'}${s.points.length ? `, ${fmtDay(s.points[0].x, true)} to ${fmtDay(s.points[s.points.length - 1].x, true)}` : ''}`).join('  ·  ');
+      const s = chosen;
+      note.textContent = `${s.label}: ${s.points.length} daily NAV${s.points.length === 1 ? '' : 's'}${s.points.length ? `, ${fmtDay(s.points[0].x, true)} to ${fmtDay(s.points[s.points.length - 1].x, true)}` : ''}`;
     }
     if (!visible.length) { canvas.style.display = 'none'; return false; }
 
@@ -124,8 +125,8 @@
       data: {
         datasets: visible.map((s) => ({
           label: s.label, data: s.points, parsing: false, borderColor: s.colour, backgroundColor: (ctx) => areaFill(ctx, s.colour, visible.length),
-          borderWidth: 2.25, borderDash: /regular/i.test(s.label) ? [7, 4] : [], pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, pointHoverBackgroundColor: s.colour, pointHoverBorderColor: isLight ? '#ffffff' : '#0b1220', pointHoverBorderWidth: 2, tension: 0.42, cubicInterpolationMode: 'monotone',
-          fill: s === visible[0] ? 'origin' : false, spanGaps: true,
+          borderWidth: 2.25, pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, pointHoverBackgroundColor: s.colour, pointHoverBorderColor: isLight ? '#ffffff' : '#0b1220', pointHoverBorderWidth: 2, tension: 0.42, cubicInterpolationMode: 'monotone',
+          fill: 'origin', spanGaps: true,
         })),
       },
       options: {
