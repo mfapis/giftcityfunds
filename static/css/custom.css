@@ -721,7 +721,7 @@ body {
 .nav-legend-sub { color: var(--color-text-subtle); font-size: 11px; }
 
 /* ---- Header links (shared _nav_links.html) ---- */
-.nav-link { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 10px; color: var(--color-text-muted); transition: color .15s, background .15s; }
+.nav-link { display: inline-flex; align-items: center; padding: 8px 10px; border-radius: 10px; color: var(--color-text-muted); transition: color .15s, background .15s; }
 .nav-link:hover { color: #2563eb; background: rgba(37, 99, 235, .06); }
 .nav-link.is-active { color: #2563eb; background: rgba(37, 99, 235, .08); }
 .more-item { display: block; padding: 10px 12px; border-radius: 10px; }
@@ -776,3 +776,6 @@ input, select { border-radius: 12px; }
 
 /* Large logo (fund page header): the fund-house icons are small files, so draw them near their own size, sharp, inside a bigger tile. */
 .amc-logo-lg img { width: 52px !important; height: 52px !important; image-rendering: -webkit-optimize-contrast; }
+
+/* Header: below 1536px the Contact Us button keeps only its icon so the links, Talk to an Expert and the theme switch fit one row. */
+@media (max-width: 1535px) { .site-nav #contactUsBtn span { display: none; } }

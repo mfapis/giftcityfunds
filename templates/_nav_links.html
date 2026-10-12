@@ -12,7 +12,7 @@
 {% macro link(key, href, label) -%}
 <li><a href="{{ href }}" class="nav-link {{ 'is-active' if active == key else '' }}">{{ label }}</a></li>
 {%- endmacro %}
-<ul class="hidden lg:flex items-center gap-1 text-[13px] font-semibold text-[var(--color-text-muted)] whitespace-nowrap shrink-0 min-w-0">
+<ul class="hidden xl:flex items-center gap-0.5 text-[13px] font-semibold text-[var(--color-text-muted)] whitespace-nowrap shrink-0 min-w-0">
   {{ link('dashboard', '/', 'Dashboard') }}
   {{ link('outbound', '/gift-city-outbound', 'Outbound Funds') }}
   {{ link('inbound', '/gift-city-inbound', 'Inbound Funds') }}
