@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}GiftCityFunds{% endblock %} | GiftCityFunds</title>
+  <meta name="description" content="{% block description %}{% endblock %}" />
+  <link rel="canonical" href="{{ request.url }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{ self.title() }} | GiftCityFunds" />
+  <meta property="og:description" content="{{ self.description() }}" />
+  <meta property="og:url" content="{{ request.url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='img/address_bar.png', _external=True) }}" />
+  <meta name="twitter:title" content="{{ self.title() }} | GiftCityFunds" />
+  <meta name="twitter:description" content="{{ self.description() }}" />
+  {% include '_seo_meta.html' %}
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/address_bar.png') }}">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { 'gcf-blue': '#2563eb', 'gcf-blue-dark': '#1d4ed8', 'gcf-neon': '#79FE0C', 'gcf-neon-dark': '#67e600', 'fin-dark': '#0b0f19', 'fin-card': '#131d31' } } }
+    }
+  </script>
+  {% block head_extra %}{% endblock %}
+  <link rel="stylesheet" href="/static/css/custom.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <nav class="site-nav sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2.5 group shrink-0">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="GiftCityFunds" class="h-11 w-auto shrink-0">
+      </a>
+      {% include '_nav_links.html' %}
+      <div class="flex items-center gap-2.5 shrink-0 ml-auto">
+        {% include '_lead_form_button.html' %}
+        {% include '_contact_us.html' %}
+        {% include '_mobile_menu_button.html' %}
+        <div class="theme-switch inline-flex items-center gap-1 p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] shrink-0">
+          <button type="button" id="themeToggleLight" aria-label="Light mode" class="theme-switch-btn active w-7 h-7 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </button>
+          <button type="button" id="themeToggleDark" aria-label="Dark mode" class="theme-switch-btn w-7 h-7 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <footer class="border-t border-[var(--color-border)] px-4 md:px-8 py-6 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[var(--color-text-subtle)]">
+      <span>© 2026 GiftCityFunds. Data sourced from fund house disclosures and public trackers; verify with the fund house before investing. Not investment advice.</span>
+      <a href="/" class="font-bold text-blue-500 hover:underline">← Back to Full Dashboard</a>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const lightBtn = document.getElementById('themeToggleLight');
+      const darkBtn = document.getElementById('themeToggleDark');
+      function setTheme(theme) {
+        root.classList.toggle('light', theme === 'light');
+        root.classList.toggle('dark', theme === 'dark');
+        if (lightBtn) lightBtn.classList.toggle('active', theme === 'light');
+        if (darkBtn) darkBtn.classList.toggle('active', theme === 'dark');
+      }
+      if (lightBtn) lightBtn.addEventListener('click', function () { setTheme('light'); });
+      if (darkBtn) darkBtn.addEventListener('click', function () { setTheme('dark'); });
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+  {% include '_analytics.html' %}
+  {% include '_lead_form_modal.html' %}
+  {% include '_mobile_menu_panel.html' %}
+</body>
+</html>

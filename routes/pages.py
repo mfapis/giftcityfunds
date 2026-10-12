@@ -49,6 +49,18 @@ def index():
     return render_template("index.html")
 
 
+@pages_bp.route("/market-intelligence")
+def market_intelligence():
+    """Fund categories, top asset managers, registration timeline and NAV leaderboard (the charts read /api/stats)."""
+    return render_template("market_intelligence.html")
+
+
+@pages_bp.route("/knowledge-hub")
+def knowledge_hub():
+    """GIFT City IFSC regulatory 101: the FAQ accordion."""
+    return render_template("knowledge_hub.html")
+
+
 @pages_bp.route("/gift-city-outbound")
 def gift_city_outbound():
     """Dedicated page for outbound GIFT City funds (India/GIFT-domiciled
@@ -222,6 +234,8 @@ def sitemap_xml():
         (url_for("pages.gift_city_inbound", _external=True), "0.9", "daily"),
         (url_for("pages.insights_index", _external=True), "0.9", "daily"),
         (url_for("pages.events_index", _external=True), "0.7", "weekly"),
+        (url_for("pages.market_intelligence", _external=True), "0.7", "daily"),
+        (url_for("pages.knowledge_hub", _external=True), "0.6", "monthly"),
     ]
     article_urls = [
         (url_for("pages.insight_detail", slug=a["slug"], _external=True), "0.7", "monthly")

@@ -1,0 +1,148 @@
+/**
+ * nav_chart.js
+ * Full-width NAV history chart for a fund page: one line per share class (Direct and Regular side by side, other classes too), each in its own
+ * colour, with a legend that doubles as an on/off switch and shows the change for the range being viewed. Needs Chart.js.
+ *
+ *   NavChart.render({ canvas, legend, note, history, range, isLight, currency })
+ *
+ * `history` rows: {nav_date, nav, share_class}. Rows without a share class are one series called "NAV".
+ */
+(function () {
+  const COLORS = { direct: '#2563eb', regular: '#f59e0b' };
+  const EXTRA = ['#10b981', '#e11d48', '#7c3aed', '#0891b2', '#64748b', '#d946ef'];
+  const hidden = new Set();                 // labels the viewer switched off; kept across range changes
+  let chart = null;
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const day = (iso) => Date.parse(String(iso).slice(0, 10) + 'T00:00:00Z');
+  const fmtDay = (ms, withYear) => {
+    const d = new Date(ms);
+    return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${withYear ? ' ' + d.getUTCFullYear() : ''}`;
+  };
+
+  /** [{label, points: [{x, y}]}] with Direct first, Regular second, then the rest as listed. */
+  function seriesOf(history) {
+    const by = new Map();
+    for (const row of history || []) {
+      const y = Number(row.nav), x = day(row.nav_date);
+      if (!Number.isFinite(y) || y <= 0 || !Number.isFinite(x)) continue;
+      const label = row.share_class || 'NAV';
+      if (!by.has(label)) by.set(label, new Map());
+      by.get(label).set(x, y);               // a date given twice keeps the last value
+    }
+    // Rows with no share class are old one-off snapshots; they are only drawn when the fund has nothing else.
+    if (by.size > 1) by.delete('NAV');
+    const list = [...by].map(([label, m]) => ({ label, points: [...m].map(([x, y]) => ({ x, y })).sort((a, b) => a.x - b.x) }));
+    const rank = (l) => (/direct/i.test(l) ? 0 : /regular/i.test(l) ? 1 : 2);
+    return list.sort((a, b) => rank(a.label) - rank(b.label));
+  }
+
+  function colourFor(label, index) {
+    if (/direct/i.test(label)) return COLORS.direct;
+    if (/regular/i.test(label)) return COLORS.regular;
+    return EXTRA[index % EXTRA.length];
+  }
+
+  function cutoffFor(range, lastMs) {
+    if (range === 'ALL' || !range) return -Infinity;
+    const end = new Date(lastMs);
+    if (range === 'YTD') return Date.UTC(end.getUTCFullYear(), 0, 1);
+    const months = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '3Y': 36, '5Y': 60 }[range] || 0;
+    return Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - months, end.getUTCDate());
+  }
+
+  function render(opts) {
+    const { canvas, legend, note, history, range = 'ALL', isLight = true, currency = 'USD' } = opts;
+    if (!canvas) return false;
+    if (chart) { chart.destroy(); chart = null; }
+
+    const all = seriesOf(history);
+    if (!all.length) { canvas.style.display = 'none'; if (legend) legend.innerHTML = ''; if (note) note.textContent = ''; return false; }
+    canvas.style.display = '';
+
+    const lastMs = Math.max(...all.map((s) => s.points[s.points.length - 1].x));
+    const from = cutoffFor(range, lastMs);
+    const shown = all.map((s, i) => ({
+      label: s.label, colour: colourFor(s.label, i - 2), full: s.points,
+      points: s.points.filter((p) => p.x >= from),
+    }));
+    const visible = shown.filter((s) => !hidden.has(s.label) && s.points.length);
+
+    const rangeName = range === 'ALL' ? 'since launch' : range === 'YTD' ? 'year to date' : `over ${range}`;
+    if (legend) {
+      legend.innerHTML = shown.map((s) => {
+        const p = s.points;
+        const change = p.length > 1 ? (p[p.length - 1].y / p[0].y - 1) * 100 : null;
+        const off = hidden.has(s.label);
+        const changeHtml = change === null ? '' : `<b style="color:${change >= 0 ? '#059669' : '#dc2626'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</b> <span class="nav-legend-sub">${rangeName}</span>`;
+        return `<button type="button" class="nav-legend-chip ${off ? 'is-off' : ''}" data-class="${esc(s.label)}" title="Click to ${off ? 'show' : 'hide'} ${esc(s.label)}">
+            <span class="nav-legend-dot" style="background:${s.colour}"></span><span class="nav-legend-name">${esc(s.label)}</span>${changeHtml}</button>`;
+      }).join('');
+      legend.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+        const l = b.getAttribute('data-class');
+        if (hidden.has(l)) hidden.delete(l); else if (visible.length > 1 || !visible.some((v) => v.label === l)) hidden.add(l);
+        render(opts);
+      }));
+    }
+
+    if (note) {
+      note.textContent = shown.map((s) => `${s.label}: ${s.points.length} daily NAV${s.points.length === 1 ? '' : 's'}${s.points.length ? `, ${fmtDay(s.points[0].x, true)} to ${fmtDay(s.points[s.points.length - 1].x, true)}` : ''}`).join('  ·  ');
+    }
+    if (!visible.length) { canvas.style.display = 'none'; return false; }
+
+    const text = isLight ? '#64748b' : '#94a3b8';
+    const grid = isLight ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.07)';
+    const spanDays = (Math.max(...visible.map((s) => s.points[s.points.length - 1].x)) - Math.min(...visible.map((s) => s.points[0].x))) / 864e5;
+
+    const xMin = Math.min(...visible.map((s) => s.points[0].x));
+    const xMax = Math.max(...visible.map((s) => s.points[s.points.length - 1].x));
+
+    const crosshair = {
+      id: 'navCrosshair',
+      afterDatasetsDraw(c) {
+        const a = c.tooltip && c.tooltip.getActiveElements && c.tooltip.getActiveElements();
+        if (!a || !a.length) return;
+        const x = a[0].element.x, { top, bottom } = c.chartArea, ctx = c.ctx;
+        ctx.save(); ctx.strokeStyle = isLight ? 'rgba(15,23,42,.25)' : 'rgba(255,255,255,.3)'; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+      },
+    };
+
+    chart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        datasets: visible.map((s) => ({
+          label: s.label, data: s.points, parsing: false, borderColor: s.colour, backgroundColor: s.colour + '14',
+          borderWidth: /regular/i.test(s.label) ? 2 : 2.75, borderDash: /regular/i.test(s.label) ? [7, 4] : [], pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, tension: 0.25,
+          fill: visible.length === 1, spanGaps: true,
+        })),
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'x', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: isLight ? '#0f172a' : '#1e293b', padding: 10, titleColor: '#fff', bodyColor: '#e2e8f0',
+            callbacks: {
+              title: (items) => (items.length ? fmtDay(items[0].parsed.x, true) : ''),
+              label: (item) => ` ${item.dataset.label}: ${item.parsed.y.toFixed(4)} ${currency}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'linear', min: xMin, max: xMax, grid: { display: false }, ticks: { color: text, maxTicksLimit: 9, maxRotation: 0, font: { size: 11 },
+              callback: (v) => fmtDay(v, spanDays > 300) }, border: { display: false },
+          },
+          y: { position: 'right', grid: { color: grid }, border: { display: false }, ticks: { color: text, font: { size: 11 }, maxTicksLimit: 7 } },
+        },
+      },
+      plugins: [crosshair],
+    });
+    return true;
+  }
+
+  window.NavChart = { render, seriesOf };
+})();

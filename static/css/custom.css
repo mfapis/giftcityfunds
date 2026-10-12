@@ -1,6 +1,6 @@
 /* custom.css - GIFT360 Styling inspired by gift360.com */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   --font-sans: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -178,7 +178,7 @@ body {
   display: inline-flex;
   white-space: nowrap;
   will-change: transform;
-  animation: tickerScroll 45s linear infinite;
+  animation: tickerScroll 140s linear infinite;
 }
 
 .ticker-track:hover {
@@ -708,3 +708,61 @@ body {
   border-color: var(--gcf-blue);
   color: var(--gcf-blue);
 }
+
+/* ---- NAV chart (fund page): range pills and the class legend ---- */
+.nav-pill { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; color: var(--color-text-muted); background: var(--color-bg-subtle); border: 1px solid transparent; transition: all .15s; }
+.nav-pill:hover { color: #2563eb; }
+.nav-pill.is-active { background: #2563eb; color: #fff; }
+.nav-legend-chip { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--color-border); background: var(--color-card); color: var(--color-text); cursor: pointer; transition: opacity .15s; }
+.nav-legend-chip.is-off { opacity: .45; }
+.nav-legend-chip.is-off .nav-legend-dot { background: #94a3b8 !important; }
+.nav-legend-dot { width: 10px; height: 10px; border-radius: 999px; flex: none; }
+.nav-legend-name { font-weight: 700; }
+.nav-legend-sub { color: var(--color-text-subtle); font-size: 11px; }
+
+/* ---- Header links (shared _nav_links.html) ---- */
+.nav-link { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 10px; color: var(--color-text-muted); transition: color .15s, background .15s; }
+.nav-link:hover { color: #2563eb; background: rgba(37, 99, 235, .06); }
+.nav-link.is-active { color: #2563eb; background: rgba(37, 99, 235, .08); }
+.more-item { display: block; padding: 10px 12px; border-radius: 10px; }
+.more-item:hover, .more-item.is-active { background: rgba(37, 99, 235, .07); }
+.more-title { display: block; font-size: 13px; font-weight: 700; color: var(--color-text); }
+.more-sub { display: block; font-size: 11px; color: var(--color-text-subtle); margin-top: 1px; }
+.amc-logo { display: inline-flex; align-items: center; justify-content: center; background: #fff; border: 1px solid var(--color-border); flex: none; overflow: hidden; }
+
+/* =====================================================================
+   Groww-inspired look: white canvas, thin borders, flat solid buttons,
+   rounded cards without lift or glow, pill filters. Brand blue stays.
+   ===================================================================== */
+:root { --font-sans: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+html.light {
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f6f7f9;
+  --color-card: #ffffff;
+  --color-card-hover: #fafbfc;
+  --color-border: #e8e9ee;
+  --color-border-strong: #d4d6de;
+  --color-text: #1b1e33;
+  --color-text-muted: #44475b;
+  --color-text-subtle: #7c7e8c;
+}
+html.light body { background: #ffffff; }
+html.light .site-nav, html.light nav.sticky { background: rgba(255, 255, 255, .92); }
+
+.glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 16px; box-shadow: none; }
+.glass-card:hover { transform: none; box-shadow: 0 6px 20px -8px rgba(15, 23, 42, .14); border-color: var(--color-border-strong); }
+html.light .glass-card:hover { background-color: var(--color-card); }
+.fund-card { transition: box-shadow .18s ease, border-color .18s ease; }
+.fund-card:hover { box-shadow: 0 10px 28px -12px rgba(15, 23, 42, .22); }
+
+.btn-blue { background: #2563eb; box-shadow: none; border-radius: 12px; }
+.btn-blue:hover { background: #1d4ed8; box-shadow: none; transform: none; }
+.btn-neon { background: #16a34a; color: #fff; box-shadow: none; }
+.btn-neon:hover { background: #15803d; box-shadow: none; transform: none; }
+
+/* sections: a quiet title style instead of the small caps eyebrow */
+section h2 { letter-spacing: -0.01em; }
+.cat-filter-btn { border-radius: 999px !important; padding: 8px 16px !important; font-weight: 600 !important; }
+.cat-filter-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+input, select { border-radius: 12px; }
+.amc-logo { box-shadow: 0 1px 2px rgba(15, 23, 42, .04); }

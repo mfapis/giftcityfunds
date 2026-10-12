@@ -48,17 +48,7 @@
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="GiftCityFunds" class="h-14 w-auto">
       </a>
 
-      <ul class="hidden md:flex items-center gap-6 text-xs font-bold tracking-wide text-[var(--color-text-muted)]">
-        <li><a href="/" class="hover:text-blue-500 transition-colors">Dashboard</a></li>
-        <li>
-          <a href="/gift-city-outbound" class="transition-colors {{ 'text-blue-500' if flow_type == 'outbound' else 'hover:text-blue-500' }}">Outbound Funds</a>
-        </li>
-        <li>
-          <a href="/gift-city-inbound" class="transition-colors {{ 'text-blue-500' if flow_type == 'inbound' else 'hover:text-blue-500' }}">Inbound Funds</a>
-        </li>
-        <li><a href="/insights" class="hover:text-blue-500 transition-colors">Insights</a></li>
-        <li><a href="/events" class="hover:text-blue-500 transition-colors">Events</a></li>
-      </ul>
+      {% include '_nav_links.html' %}
 
       <div class="flex items-center gap-2.5">
         {% include '_lead_form_button.html' %}

@@ -1,0 +1,40 @@
+{# Desktop header links, shared by every page. A page can pass `nav_active` ('dashboard', 'outbound', 'inbound', 'performance', 'insights',
+   'events', 'market', 'knowledge') to highlight its own entry; otherwise it is taken from the URL. #}
+{% set p = request.path %}
+{% set active = nav_active|default(
+     'outbound' if p == '/gift-city-outbound' else
+     'inbound' if p == '/gift-city-inbound' else
+     'insights' if p.startswith('/insights') else
+     'events' if p.startswith('/events') else
+     'market' if p == '/market-intelligence' else
+     'knowledge' if p == '/knowledge-hub' else
+     'dashboard' if p == '/' else '') %}
+{% macro link(key, href, label) -%}
+<li><a href="{{ href }}" class="nav-link {{ 'is-active' if active == key else '' }}">{{ label }}</a></li>
+{%- endmacro %}
+<ul class="hidden lg:flex items-center gap-1 text-[13px] font-semibold text-[var(--color-text-muted)] whitespace-nowrap shrink-0 min-w-0">
+  {{ link('dashboard', '/', 'Dashboard') }}
+  {{ link('outbound', '/gift-city-outbound', 'Outbound Funds') }}
+  {{ link('inbound', '/gift-city-inbound', 'Inbound Funds') }}
+  {{ link('performance', '/#performance', 'Returns Comparison') }}
+  {{ link('insights', '/insights', 'Insights') }}
+  {{ link('events', '/events', 'Events') }}
+  <li class="relative group">
+    <button type="button" class="nav-link inline-flex items-center gap-1 {{ 'is-active' if active in ('market', 'knowledge') else '' }}" aria-haspopup="true">
+      More
+      <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+    </button>
+    <div class="absolute right-0 top-full pt-2 hidden group-hover:block group-focus-within:block z-50">
+      <div class="w-60 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-xl p-1.5">
+        <a href="/market-intelligence" class="more-item {{ 'is-active' if active == 'market' else '' }}">
+          <span class="more-title">Market Intelligence</span>
+          <span class="more-sub">Fund categories, top managers, NAV leaderboard</span>
+        </a>
+        <a href="/knowledge-hub" class="more-item {{ 'is-active' if active == 'knowledge' else '' }}">
+          <span class="more-title">Knowledge Hub</span>
+          <span class="more-sub">GIFT City IFSC regulatory 101</span>
+        </a>
+      </div>
+    </div>
+  </li>
+</ul>

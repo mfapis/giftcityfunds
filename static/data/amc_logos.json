@@ -1,0 +1,29 @@
+{
+  "_note": "AMC logo per fund house. A logo is used when every word of a 'match' entry appears in the AMC name (case-insensitive); the first matching entry wins, so list the more specific names first. AMCs without an entry show their initials.",
+  "logos": [
+    { "match": ["baroda", "bnp"], "file": "baroda-bnp-paribas.png" },
+    { "match": ["hdfc"], "file": "hdfc.png" },
+    { "match": ["dsp"], "file": "dsp.png" },
+    { "match": ["ppfas"], "file": "ppfas.png" },
+    { "match": ["parag", "parikh"], "file": "ppfas.png" },
+    { "match": ["sundaram"], "file": "sundaram.png" },
+    { "match": ["tata"], "file": "tata.png" },
+    { "match": ["edelweiss"], "file": "edelweiss.png" },
+    { "match": ["bandhan"], "file": "bandhan.png" },
+    { "match": ["kotak"], "file": "kotak.png" },
+    { "match": ["aditya", "birla"], "file": "aditya-birla.png" },
+    { "match": ["absl"], "file": "aditya-birla.png" },
+    { "match": ["uti"], "file": "uti.png" },
+    { "match": ["whiteoak"], "file": "whiteoak.png" },
+    { "match": ["axis"], "file": "axis.png" },
+    { "match": ["mirae"], "file": "mirae.png" },
+    { "match": ["nj", "asset"], "file": "nj.png" },
+    { "match": ["sbi"], "file": "sbi.png" },
+    { "match": ["unifi"], "file": "unifi.png" },
+    { "match": ["quant"], "file": "quant.png" },
+    { "match": ["mo", "alternative"], "file": "motilal-oswal.png" },
+    { "match": ["motilal"], "file": "motilal-oswal.png" },
+    { "match": ["360"], "file": "360-one.png" },
+    { "match": ["icici"], "file": "icici-prudential.png" }
+  ]
+}

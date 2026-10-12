@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   // NAV Chart
   // --------------------------------------------------------------------------
-  const NAV_RANGES = ['YTD', '1M', '3M', '1Y', '3Y', '5Y', 'ALL'];
+  const NAV_RANGES = ['1M', '3M', '6M', 'YTD', '1Y', '3Y', '5Y', 'ALL'];
 
   // Filters the fund's full recorded NAV history down to a time-range tab.
   // With sparse real data (most funds have 1-2 recorded points so far),
@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (range === 'YTD') {
       cutoff = new Date(now.getFullYear(), 0, 1);
     } else {
-      const monthsBack = { '1M': 1, '3M': 3, '1Y': 12, '3Y': 36, '5Y': 60 }[range] || 0;
+      const monthsBack = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '3Y': 36, '5Y': 60 }[range] || 0;
       cutoff = new Date(now);
       cutoff.setMonth(cutoff.getMonth() - monthsBack);
     }
@@ -660,20 +660,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function setActiveRangeTab(range) {
     document.querySelectorAll('.nav-range-tab').forEach(btn => {
       const isActive = btn.getAttribute('data-range') === range;
-      btn.classList.toggle('bg-blue-600', isActive);
-      btn.classList.toggle('text-white', isActive);
-      btn.classList.toggle('text-[var(--color-text-muted)]', !isActive);
+      btn.classList.toggle('is-active', isActive);
     });
   }
 
   function updateNavChart(range) {
     state.navRange = range;
     setActiveRangeTab(range);
-    const filtered = filterHistoryByRange(state.fullNavHistory, range);
-    const emptyMessage = (state.fullNavHistory && state.fullNavHistory.length > 0 && filtered.length === 0)
-      ? `No NAV snapshots recorded within the last ${range === 'YTD' ? 'year-to-date' : range.toLowerCase()} window -- try a wider range.`
-      : null;
-    renderNavChart(state.currentModalFund, filtered, emptyMessage);
+    const history = state.fullNavHistory || [];
+    const empty = document.getElementById('navEmptyNote');
+    const drawn = window.NavChart && window.NavChart.render({
+      canvas: document.getElementById('modalNavCanvas'),
+      legend: document.getElementById('navLegend'),
+      note: document.getElementById('navChartNote'),
+      history,
+      range,
+      isLight: document.documentElement.classList.contains('light'),
+      currency: (state.currentModalFund && state.currentModalFund.currency) || 'USD',
+    });
+    if (empty) {
+      empty.classList.toggle('hidden', !!drawn);
+      empty.textContent = history.length
+        ? `No NAV recorded in the ${range === 'YTD' ? 'year-to-date' : range.toLowerCase()} window. Try a wider range.`
+        : 'No NAV history recorded yet for this fund. The trend builds up here as the data pipeline runs.';
+    }
   }
 
   // Soft top-to-bottom fade under the NAV line -- cool cyan-blue at the top,

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     sortOrder: 'desc',
     currentPage: 1,
     pageSize: 15,
-    viewMode: 'table', // 'table' or 'grid'
+    viewMode: 'grid', // 'table' or 'grid' -- cards (logo on top, name below) are the default
     charts: {},
   };
 
@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   async function init() {
     try {
+      if (window.AmcLogo) await window.AmcLogo.ready;
       await Promise.all([fetchStats(), fetchFunds()]);
       setupEventListeners();
     } catch (err) {
@@ -120,6 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const amcLogo = (name, size) => (window.AmcLogo ? window.AmcLogo.html(name, size) : '');
+
   // Real, live fund data shown right under the hero -- not a hardcoded
   // sample list, so it always reflects whatever's actually in the API.
   // Prefers funds with a live NAV (more useful at a glance); falls back to
@@ -132,14 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const withNav = funds.filter(f => f.nav != null);
-    const preview = (withNav.length ? withNav : funds).slice(0, 3);
+    // newest NAV date first, so the funds shown are the ones with a current daily NAV
+    const preview = [...(withNav.length ? withNav : funds)].sort((x, y) => String(y.nav_as_of || '').localeCompare(String(x.nav_as_of || ''))).slice(0, 4);
 
     const rows = preview.map(f => {
       const slug = slugify(f.fund_name);
       const navText = f.nav != null ? `${Number(f.nav).toFixed(2)} ${f.nav_currency || 'USD'}` : '—';
       return `
         <a href="/fund/${f.fund_id}/${slug}" class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 hover:bg-[var(--color-card-hover)] transition-colors border-b border-[var(--color-border)] last:border-b-0">
-          <div class="min-w-0">
+          ${amcLogo(f.amc_name, 40)}
+          <div class="min-w-0 flex-1">
             <div class="text-xs sm:text-sm font-bold text-[var(--color-text)] truncate">${escapeHtml(f.fund_name)}</div>
             <div class="text-[10px] sm:text-[11px] text-[var(--color-text-subtle)] truncate">${escapeHtml(f.category || 'Unclassified')} · ${escapeHtml(f.amc_name || '')}</div>
           </div>
@@ -218,9 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const shortName = shortenAmcName(a.amc);
       return `
         <div class="glass-card rounded-2xl p-4 text-center flex flex-col items-center justify-between" title="${escapeHtml(a.amc)}">
-          <div class="w-12 h-12 rounded-xl ${color.bg} border ${color.border} flex items-center justify-center font-bold ${color.text} text-xs mb-2">
-            ${escapeHtml(amcBadgeInitials(a.amc))}
-          </div>
+          <div class="mb-2">${amcLogo(a.amc, 52)}</div>
           <span class="font-bold text-xs text-[var(--color-text)]">${escapeHtml(shortName)}</span>
           <span class="text-[10px] text-[var(--color-text-subtle)]">${a.count} GIFT Fund${a.count === 1 ? '' : 's'}</span>
         </div>
@@ -238,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     performers.forEach(p => {
       itemsHtml += `
         <span class="inline-flex items-center gap-2 mx-6 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          ${amcLogo(p.amc_name || p.amc || p.fund_name, 22)}
           <span class="text-[var(--color-text)]">${escapeHtml(p.fund_name)}</span>
           <span class="text-emerald-400 font-mono font-bold">${p.nav} ${p.nav_currency || 'USD'}</span>
           <span class="text-[var(--color-text-subtle)] text-[10px]">(${p.nav_as_of || 'Live'})</span>
@@ -616,6 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="compare-toggle-btn w-5 h-5 rounded border ${isCompared ? 'bg-blue-600 border-blue-600 text-white' : 'border-[var(--color-border-strong)] text-transparent'} flex items-center justify-center transition-all hover:border-blue-500" data-id="${fund.fund_id}" title="Add to compare">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </button>
+            ${amcLogo(fund.amc_name, 34)}
             <div class="min-w-0">
               <div class="font-bold text-[0.88rem] text-[var(--color-text)] group-hover:text-blue-400 transition-colors flex items-center gap-2">
                 <span class="truncate">${escapeHtml(fund.fund_name)}</span>
@@ -659,21 +663,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function createFundCard(fund) {
+    const href = `/fund/${fund.fund_id}/${slugify(fund.fund_name)}`;
     return `
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+      <div class="fund-card glass-card rounded-2xl p-5 flex flex-col justify-between group">
         <div>
-          <div class="flex items-start justify-between gap-2 mb-3">
-            ${flowBadgeHtml(fund, 'text-[10px] uppercase px-2 py-0.5')}
-            <span class="text-xs text-[var(--color-text-subtle)] font-mono">${fund.launch_date || 'N/A'}</span>
+          <div class="flex items-start justify-between gap-2 mb-4">
+            <a href="${href}" class="shrink-0" aria-label="${escapeHtml(fund.amc_name || 'Fund house')}">${amcLogo(fund.amc_name, 52)}</a>
+            <div class="flex flex-col items-end gap-1">
+              ${flowBadgeHtml(fund, 'text-[10px] uppercase px-2 py-0.5')}
+              <span class="text-[11px] text-[var(--color-text-subtle)] font-mono">${fund.launch_date || 'N/A'}</span>
+            </div>
           </div>
-          <h3 class="font-bold text-sm text-[var(--color-text)] group-hover:text-blue-400 transition-colors line-clamp-2 mb-1">
-            ${escapeHtml(fund.fund_name)}
-          </h3>
-          <p class="text-xs text-[var(--color-text-muted)] mb-4">${escapeHtml(fund.amc_name || 'GIFT City AMC')}</p>
-          <div class="grid grid-cols-2 gap-2 bg-[var(--color-bg-subtle)] border border-[var(--color-border)] p-3 rounded-xl mb-4">
+          <a href="${href}" class="block">
+            <h3 class="font-bold text-[15px] leading-snug text-[var(--color-text)] group-hover:text-blue-500 transition-colors line-clamp-2">
+              ${escapeHtml(fund.fund_name)}
+            </h3>
+          </a>
+          <p class="text-xs text-[var(--color-text-muted)] mt-1 mb-4 line-clamp-1">${escapeHtml(fund.amc_name || 'GIFT City AMC')}${fund.category ? ' &middot; ' + escapeHtml(fund.category) : ''}</p>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-[var(--color-border)] mb-4">
             <div>
               <span class="block text-[10px] text-[var(--color-text-subtle)] uppercase">NAV</span>
-              <span class="font-mono font-bold text-sm text-emerald-400">
+              <span class="font-mono font-bold text-sm text-emerald-500">
                 ${fund.nav !== null ? `${fund.nav.toFixed(2)} ${fund.nav_currency || 'USD'}` : '—'}
               </span>
             </div>
@@ -685,9 +695,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
-          <button class="view-detail-btn text-xs font-bold text-blue-400 hover:text-blue-300" data-id="${fund.fund_id}">View Intelligence →</button>
-          <button class="compare-toggle-btn text-xs px-2 py-1 rounded border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]" data-id="${fund.fund_id}">
+        <div class="flex items-center justify-between gap-2">
+          <button class="view-detail-btn text-xs font-bold text-blue-500 hover:text-blue-600" data-id="${fund.fund_id}">View Intelligence →</button>
+          <button class="compare-toggle-btn text-xs px-2.5 py-1 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]" data-id="${fund.fund_id}">
             ${state.compareIds.has(fund.fund_id) ? '✓ Compared' : '+ Compare'}
           </button>
         </div>
