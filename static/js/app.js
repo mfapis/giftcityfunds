@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   const themeToggleLight = document.getElementById('themeToggleLight');
   const themeToggleDark = document.getElementById('themeToggleDark');
-  const storedTheme = localStorage.getItem('gcf-theme') || 'light';
+  const storedTheme = 'light';
 
   function applyTheme(theme) {
     if (theme === 'light') {

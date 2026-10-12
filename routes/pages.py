@@ -22,7 +22,7 @@ from content.events import EVENTS
 from content.faqs import FAQ_SOURCE_ATTRIBUTION, INBOUND_FAQS, OUTBOUND_FAQS
 from content.insights import ARTICLES, CATEGORIES, get_article, related_articles
 from routes.auth import login_required
-from services import adapters
+from services import adapters, verified
 from services.funds import slugify
 from services.mf_engine import MfEngineError, fetch_funds
 
@@ -73,6 +73,7 @@ def gift_city_outbound():
         page_title="GIFT City Outbound Funds",
         page_subtitle="India/GIFT-domiciled capital investing abroad — AIFs, PMS, and retail fund strategies for global investing.",
         funds=funds,
+        verified_info=verified.info(),
         data_unavailable=data_unavailable,
         faqs=OUTBOUND_FAQS,
         faq_source=FAQ_SOURCE_ATTRIBUTION,
@@ -93,6 +94,7 @@ def gift_city_inbound():
         page_title="GIFT City Inbound Funds",
         page_subtitle="Foreign and NRI capital investing into India through GIFT City IFSC — fund houses, strategies, and tax structure.",
         funds=funds,
+        verified_info=verified.info(),
         data_unavailable=data_unavailable,
         faqs=INBOUND_FAQS,
         faq_source=FAQ_SOURCE_ATTRIBUTION,
