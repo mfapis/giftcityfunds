@@ -46,6 +46,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   // Utility
   // --------------------------------------------------------------------------
+  // The fund house's own latest factsheet (the fund's factsheet_url, mapped to source_url). Null when there is none: a fund
+  // house that publishes no factsheet (HDFC India) has no link, and a link that is only a home page is not a factsheet.
+  function factsheetUrl(f) {
+    const u = f && f.source_url;
+    if (typeof u !== 'string') return null;
+    try {
+      const url = new URL(u);
+      if (!/^https?:$/.test(url.protocol) || url.pathname === '/' || url.pathname === '') return null;
+      return url.href;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setFactsheetButton(f) {
+    const btn = document.getElementById('modalFactsheetBtn');
+    const none = document.getElementById('modalFactsheetNone');
+    if (!btn || !none) return;
+    const url = factsheetUrl(f);
+    btn.classList.toggle('hidden', !url);
+    none.classList.toggle('hidden', !!url);
+    if (url) {
+      btn.href = url;
+      btn.onclick = () => {
+        if (window.gaTrack) window.gaTrack('Open Factsheet', { fund_id: f.fund_id, fund_name: f.fund_name });
+      };
+    }
+  }
+
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -863,6 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       document.getElementById('modalLaunchDate').textContent = f.launch_date || 'Not Publicly Disclosed';
+      setFactsheetButton(f);
       const sourceLinkEl = document.getElementById('modalSourceLink');
       sourceLinkEl.href = f.source_url;
       sourceLinkEl.textContent = f.source_name;
