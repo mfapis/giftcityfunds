@@ -103,12 +103,14 @@
 
     <!-- Header (full width, above both columns) -->
     <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl mb-6">
+     <div class="flex items-start gap-4 sm:gap-6">
+      <div id="fundHeaderLogo" class="shrink-0"></div>
+      <div class="min-w-0 flex-1">
       <div class="flex items-center gap-2 mb-2 flex-wrap">
         <span id="modalTierBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold">Tier 1</span>
         <span id="modalFlowBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold hidden"></span>
         <span id="modalCategory" class="text-xs text-[var(--color-text-subtle)]">Retail Feeder Fund</span>
       </div>
-      <div id="fundHeaderLogo" class="mb-3"></div>
       <h1 id="modalFundName" class="text-2xl md:text-3xl font-black text-[var(--color-text)]">{{ fund_name }}</h1>
       <p id="modalAmcName" class="text-sm text-blue-400 font-bold mt-0.5">{{ amc_name }}</p>
       <p id="modalFundManager" class="text-[11px] text-[var(--color-text-subtle)] mt-0.5 hidden"></p>
@@ -125,6 +127,8 @@
           Factsheet not published
         </span>
       </div>
+      </div>
+     </div>
     </div>
 
     <!-- NAV history: full width, one line per share class (Direct and Regular side by side) -->
