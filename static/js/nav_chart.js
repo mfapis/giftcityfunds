@@ -8,7 +8,7 @@
  * `history` rows: {nav_date, nav, share_class}. Rows without a share class are one series called "NAV".
  */
 (function () {
-  const COLORS = { direct: '#2563eb', regular: '#f59e0b' };
+  const COLORS = { direct: '#38bdf8', regular: '#f59e0b' };   // Direct keeps the cyan-blue the NAV line always had
   const EXTRA = ['#10b981', '#e11d48', '#7c3aed', '#0891b2', '#64748b', '#d946ef'];
   const hidden = new Set();                 // labels the viewer switched off; kept across range changes
   let chart = null;
@@ -57,7 +57,7 @@
     const { ctx, chartArea } = context.chart;
     if (!chartArea) return colour + '22';
     const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-    g.addColorStop(0, colour + '55');
+    g.addColorStop(0, colour + '52');
     g.addColorStop(1, colour + '00');
     return g;
   }
@@ -102,7 +102,7 @@
     if (!visible.length) { canvas.style.display = 'none'; return false; }
 
     const text = isLight ? '#64748b' : '#94a3b8';
-    const grid = isLight ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.07)';
+    const grid = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
     const spanDays = (Math.max(...visible.map((s) => s.points[s.points.length - 1].x)) - Math.min(...visible.map((s) => s.points[0].x))) / 864e5;
 
     const xMin = Math.min(...visible.map((s) => s.points[0].x));
@@ -124,7 +124,7 @@
       data: {
         datasets: visible.map((s) => ({
           label: s.label, data: s.points, parsing: false, borderColor: s.colour, backgroundColor: (ctx) => areaFill(ctx, s.colour, visible.length),
-          borderWidth: /regular/i.test(s.label) ? 2 : 2.75, borderDash: /regular/i.test(s.label) ? [7, 4] : [], pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, tension: 0.25,
+          borderWidth: 2.25, borderDash: /regular/i.test(s.label) ? [7, 4] : [], pointRadius: s.points.length < 40 ? 3 : 0, pointHoverRadius: 5, pointHoverBackgroundColor: s.colour, pointHoverBorderColor: isLight ? '#ffffff' : '#0b1220', pointHoverBorderWidth: 2, tension: 0.42, cubicInterpolationMode: 'monotone',
           fill: s === visible[0] ? 'origin' : false, spanGaps: true,
         })),
       },
