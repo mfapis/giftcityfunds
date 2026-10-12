@@ -130,7 +130,7 @@
     <div class="grid lg:grid-cols-3 gap-6 items-start">
 
       <!-- Left column: chart + all data sections -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2 space-y-6 min-w-0">
 
         <!-- NAV Performance Chart -->
         <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl">
@@ -150,6 +150,15 @@
           <div id="modalNavChartWrapper" class="h-64 md:h-80 w-full bg-[var(--color-bg-subtle)] border border-[var(--color-border)] rounded-2xl p-3 relative">
             <canvas id="modalNavCanvas"></canvas>
           </div>
+        </div>
+
+        <!-- Returns and volatility of every share class, from its daily NAV (scrolls sideways when there are many classes) -->
+        <div id="modalReturnsSection" class="hidden min-w-0 glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Returns &amp; Volatility</h3>
+            <span class="text-[10px] text-[var(--color-text-subtle)]">Calculated from daily NAV</span>
+          </div>
+          <div id="modalReturnsBody" class="min-w-0 bg-[var(--color-bg-subtle)] border border-[var(--color-border)] rounded-2xl p-3"></div>
         </div>
 
         <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl space-y-5">
@@ -337,6 +346,7 @@
     window.GIFT360_LOGGED_IN = {{ 'true' if session.user_id else 'false' }};
     window.GIFT_FUND_ID = {{ fund_id }};
   </script>
+  <script src="/static/js/returns_table.js"></script>
   <script src="/static/js/fund_detail.js"></script>
   {% include '_analytics.html' %}
   {% include '_lead_form_modal.html' %}

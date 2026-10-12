@@ -846,6 +846,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   // Load the fund
   // --------------------------------------------------------------------------
+  // Returns and volatility per share class from the daily NAV; the section stays hidden when no class has a usable history.
+  function renderReturnsTable(f, history) {
+    const section = document.getElementById('modalReturnsSection');
+    const body = document.getElementById('modalReturnsBody');
+    if (!section || !body || !window.ReturnsTable) return;
+    const shown = window.ReturnsTable.render(body, history, {
+      category: f.category, aum: f.aum, aumCurrency: f.aum_currency, aumDate: f.aum_date,
+    });
+    section.classList.toggle('hidden', !shown);
+  }
+
   async function loadFund() {
     const fundId = window.GIFT_FUND_ID;
     try {
@@ -939,6 +950,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       state.fullNavHistory = navHistory;
       updateNavChart(state.navRange || 'ALL');
+      renderReturnsTable(f, navHistory);
     } catch (e) {
       console.error('Error loading fund detail page:', e);
     }

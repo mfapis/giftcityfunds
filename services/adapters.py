@@ -82,6 +82,7 @@ def fund_summary(fund: Dict[str, Any]) -> Dict[str, Any]:
         "expense_ratio": _num(direct.get("ter_pct")) if direct else None,
         "aum": _num(fund.get("aum_usd")),
         "aum_currency": "USD" if fund.get("aum_usd") is not None else None,
+        "aum_date": _date(fund.get("aum_date")),
         "aum_unit": None,
         "fund_flow_type": fund.get("fund_flow_type"),
         "benchmark_index": fund.get("benchmark_index"),
@@ -273,6 +274,8 @@ def nav_history(fund: Dict[str, Any]) -> List[Dict[str, Any]]:
         {
             "nav_date": _date(p.get("nav_date")),
             "nav": _num(p.get("nav")),
+            # the share class the NAV belongs to: the returns table is calculated per class (None = an old one-off snapshot)
+            "share_class": p.get("share_class"),
             "nav_currency": fund.get("base_currency") or "USD",
             "source_name": p.get("source"),
         }
