@@ -1,0 +1,63 @@
+{
+  "_note": "The funds whose data has been checked field by field against the fund house's latest factsheet and notices (NAV history, TER, minimum investment, exit load, benchmark, holdings and allocations). A fund counts as verified only when its id AND its name both match, so a fund that is deleted and re-created under the same id is not carried over. Add a fund here only after that check.",
+  "verified_as_of": "2026-10-12",
+  "basis": "Latest factsheets and notices published by each fund house",
+  "funds": [
+    {
+      "id": 1,
+      "name": "DSP Global Equity Fund"
+    },
+    {
+      "id": 5,
+      "name": "Edelweiss Greater China Equity Fund"
+    },
+    {
+      "id": 201,
+      "name": "HDFC India Balanced Advantage Fund"
+    },
+    {
+      "id": 247,
+      "name": "HDFC India Diversified Equity FOF"
+    },
+    {
+      "id": 202,
+      "name": "HDFC India Flexi Cap Fund"
+    },
+    {
+      "id": 236,
+      "name": "HDFC India Mid-cap Opportunities Fund"
+    },
+    {
+      "id": 237,
+      "name": "HDFC India NIFTY 50 Fund"
+    },
+    {
+      "id": 203,
+      "name": "HDFC India Small Cap Fund"
+    },
+    {
+      "id": 234,
+      "name": "HDFC International – Developed Markets Equity Fund"
+    },
+    {
+      "id": 235,
+      "name": "HDFC International – Emerging Markets Equity Fund"
+    },
+    {
+      "id": 172,
+      "name": "Parag Parikh IFSC Nasdaq 100 Fund of Fund"
+    },
+    {
+      "id": 3,
+      "name": "Parag Parikh IFSC S&P 500 Fund of Fund"
+    },
+    {
+      "id": 174,
+      "name": "Sundaram India Mid Cap - GIFT"
+    },
+    {
+      "id": 169,
+      "name": "Tata India Dynamic Equity Fund"
+    }
+  ]
+}

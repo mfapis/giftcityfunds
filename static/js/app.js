@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     searchQuery: '',
     tierFilter: 'all',
     categoryFilter: 'all',
+    verifiedTab: 'verified', // 'verified' | 'other' | 'all' -- the checked funds first
+    verifiedInfo: null,
     currencyFilter: 'ALL',
     navFilter: 'all',
     sortBy: 'nav',
@@ -94,8 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (data.success) {
         state.allFunds = data.funds;
+        state.verifiedInfo = data.verified_info || null;
         applyFilters();
         renderHeroFundPreview(data.funds);
+        updateVerifiedTabs();
         updateCategoryTabCounts();
       }
     } catch (e) {
@@ -109,14 +113,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // is added or removed. Uses the same substring-match logic as
   // applyFilters()'s category filter so a tab's count always matches what
   // clicking it actually shows.
+  // Verified / Other / All tabs: counts and the one-line explanation under them.
+  function updateVerifiedTabs() {
+    const ok = state.allFunds.filter(f => f.verified).length;
+    const set = (sel, n) => document.querySelectorAll(sel).forEach(el => { el.textContent = `(${n})`; });
+    set('.verified-count', ok);
+    set('.other-count', state.allFunds.length - ok);
+    set('.all-count', state.allFunds.length);
+    document.querySelectorAll('.verified-tab').forEach(b => b.classList.toggle('is-active', b.getAttribute('data-verified-tab') === state.verifiedTab));
+    const note = document.getElementById('verifiedNote');
+    if (!note) return;
+    const info = state.verifiedInfo || {};
+    note.textContent = state.verifiedTab === 'verified'
+      ? `These ${ok} funds are checked field by field against ${info.basis ? info.basis.toLowerCase() : "each fund house's latest factsheet and notices"} (as on ${info.as_of || 'the last check'}): NAV history, expense ratio, minimum investment, exit load, benchmark, holdings and allocations.`
+      : state.verifiedTab === 'other'
+        ? 'These funds come from public directory listings. Their details are shown as listed and are not independently checked against a factsheet.'
+        : 'Verified funds are marked with a green tick. All other funds are directory listings that are not independently checked.';
+  }
+
+  function verifiedBadge(f) {
+    return f && f.verified
+      ? '<span class="verified-badge" title="Checked against the fund house\'s latest factsheet and notices"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>Verified</span>'
+      : '';
+  }
+
   function updateCategoryTabCounts() {
     document.querySelectorAll('.cat-filter-btn').forEach(btn => {
       const countEl = btn.querySelector('.cat-count');
       if (!countEl) return;
       const cat = btn.getAttribute('data-category');
+      const pool = state.verifiedTab === 'verified' ? state.allFunds.filter(f => f.verified)
+        : state.verifiedTab === 'other' ? state.allFunds.filter(f => !f.verified) : state.allFunds;
       const count = cat === 'all'
-        ? state.allFunds.length
-        : state.allFunds.filter(f => f.category && f.category.toLowerCase().includes(cat.toLowerCase())).length;
+        ? pool.length
+        : pool.filter(f => f.category && f.category.toLowerCase().includes(cat.toLowerCase())).length;
       countEl.textContent = `(${count})`;
     });
   }
@@ -134,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">No funds available right now.</div>';
       return;
     }
-    const withNav = funds.filter(f => f.nav != null);
+    const withNav = funds.filter(f => f.nav != null && f.verified);
     // newest NAV date first, so the funds shown are the ones with a current daily NAV
     const preview = [...(withNav.length ? withNav : funds)].sort((x, y) => String(y.nav_as_of || '').localeCompare(String(x.nav_as_of || ''))).slice(0, 4);
 
@@ -501,6 +531,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Verified / other
+    if (state.verifiedTab === 'verified') result = result.filter(f => f.verified);
+    else if (state.verifiedTab === 'other') result = result.filter(f => !f.verified);
+
     // Category filter
     if (state.categoryFilter !== 'all') {
       result = result.filter(f => f.category && f.category.toLowerCase().includes(state.categoryFilter.toLowerCase()));
@@ -622,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${amcLogo(fund.amc_name, 34)}
             <div class="min-w-0">
               <div class="font-bold text-[0.88rem] text-[var(--color-text)] group-hover:text-blue-400 transition-colors flex items-center gap-2">
-                <span class="truncate">${escapeHtml(fund.fund_name)}</span>
+                <span class="truncate">${escapeHtml(fund.fund_name)}</span>${verifiedBadge(fund)}
               </div>
               <div class="text-[0.72rem] text-[var(--color-text-muted)] flex items-center gap-2 mt-0.5">
                 <span>${escapeHtml(fund.amc_name || 'GIFT City Issuer')}</span>
@@ -671,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="${href}" class="shrink-0" aria-label="${escapeHtml(fund.amc_name || 'Fund house')}">${amcLogo(fund.amc_name, 52)}</a>
             <div class="flex flex-col items-end gap-1">
               ${flowBadgeHtml(fund, 'text-[10px] uppercase px-2 py-0.5')}
+              ${verifiedBadge(fund)}
               <span class="text-[11px] text-[var(--color-text-subtle)] font-mono">${fund.launch_date || 'N/A'}</span>
             </div>
           </div>
@@ -1739,6 +1774,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.gaTrack) window.gaTrack('Filter Used', { filter: 'flow_type', value: e.target.value });
       });
     }
+
+    // Verified / other tabs
+    document.querySelectorAll('.verified-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.verifiedTab = btn.getAttribute('data-verified-tab');
+        updateVerifiedTabs();
+        updateCategoryTabCounts();
+        applyFilters();
+        if (window.gaTrack) window.gaTrack('Filter Used', { filter: 'verified', value: state.verifiedTab });
+      });
+    });
 
     // Category filter tabs
     document.querySelectorAll('.cat-filter-btn').forEach(btn => {

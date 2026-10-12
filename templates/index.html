@@ -302,6 +302,19 @@
       </div>
     </div>
 
+    <!-- Verified / other split: the verified funds are checked against the fund house's latest factsheet and notices -->
+    <div class="mb-4">
+      <div class="inline-flex p-1 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)]" role="tablist">
+        <button type="button" data-verified-tab="verified" class="verified-tab is-active">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>
+          Verified <span class="verified-count"></span>
+        </button>
+        <button type="button" data-verified-tab="other" class="verified-tab">Other funds <span class="other-count"></span></button>
+        <button type="button" data-verified-tab="all" class="verified-tab">All <span class="all-count"></span></button>
+      </div>
+      <p id="verifiedNote" class="mt-2 text-xs text-[var(--color-text-subtle)] max-w-3xl"></p>
+    </div>
+
     <!-- Category Tabs -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 text-xs font-bold no-scrollbar">
       <button class="cat-filter-btn px-4 py-2 rounded-xl border border-[var(--color-border)] bg-blue-600 text-white transition-all shrink-0 active" data-category="all">

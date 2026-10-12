@@ -19,6 +19,7 @@ deliberately dropped rather than faked:
 
 from __future__ import annotations
 
+from services import verified
 from typing import Any, Dict, List, Optional
 
 
@@ -92,6 +93,7 @@ def fund_summary(fund: Dict[str, Any]) -> Dict[str, Any]:
         "source_url": fund.get("factsheet_url"),
         "source_name": (fund.get("amc") or {}).get("name") or fund.get("amc_name"),
         "plan_type": (direct or {}).get("class_name") or "—",
+        "verified": verified.is_verified(fund.get("id"), fund.get("fund_name")),
     }
 
 

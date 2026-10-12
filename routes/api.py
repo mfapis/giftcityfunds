@@ -40,7 +40,7 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request, session
 
 from routes.auth import login_required
-from services import adapters, performance
+from services import adapters, performance, verified
 from services.demo_db import DemoDbError, execute, fetch_all, get_db_connection
 from services.leads import submit_lead, validate_lead
 from services.mf_engine import MfEngineError, fetch_fund, fetch_funds
@@ -128,6 +128,7 @@ def get_funds():
         "success": True,
         "count": len(funds),
         "funds": funds,
+        "verified_info": verified.info(),
     })
 
 
