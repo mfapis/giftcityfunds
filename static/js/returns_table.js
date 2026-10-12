@@ -182,5 +182,72 @@
     return true;
   }
 
-  return { RETURN_PERIODS, VOLATILITY_PERIODS, metricsFor, buildModel, heat, render, monthsBefore };
+
+  // ---------- comparison: a column per fund (the home page), the same calculation as a fund's own page ----------
+  /** funds: [{fund_id, fund_name, amc_name, category, inception_date, aum, aum_date, classes: {Direct: {label, points}, Regular: ...|null}}].
+   *  A fund with no class for the plan shown (HDFC India has no Direct/Regular names) shows its headline class. */
+  function buildComparison(funds, plan) {
+    const columns = (funds || []).map((f) => {
+      const cls = (f.classes && (f.classes[plan] || f.classes.Direct)) || null;
+      const metrics = cls ? metricsFor(cls.points.map(([date, nav]) => ({ date, nav }))) : null;
+      return { fund: f, classLabel: cls ? cls.label : null, metrics };
+    }).filter((c) => c.metrics && c.metrics.count >= 2);
+    const rowsOf = (periods, kind) => periods
+      .map((p) => ({ key: p.key, label: p.label, values: columns.map((c) => c.metrics[kind][p.key] ?? null) }))
+      .filter((r) => r.values.some((v) => v !== null));
+    return { columns, returns: rowsOf(RETURN_PERIODS, 'returns'), volatility: rowsOf(VOLATILITY_PERIODS, 'volatility') };
+  }
+
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fmtDate = (iso) => {
+    if (!iso) return '-';
+    const [y, m, d] = String(iso).slice(0, 10).split('-').map(Number);
+    return Number.isFinite(y) ? `${String(d).padStart(2, '0')}-${MONTHS[m - 1]}-${String(y).slice(2)}` : '-';
+  };
+  const fmtUsd = (v) => {
+    if (v === null || v === undefined || !Number.isFinite(Number(v))) return '-';
+    const n = Number(v);
+    return n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(2)}M` : `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  };
+
+  /** Renders the comparison table into `container`. Returns false when no fund has a usable series. */
+  function renderComparison(container, funds, plan) {
+    const m = buildComparison(funds, plan);
+    if (!m.columns.length) return false;
+    const NAVY = '#16168a', W1 = 128, W2 = 118;
+    const nav = (extra = '') => `background:${NAVY};color:#fff;${extra}`;
+    const stick1 = (extra = '') => `position:sticky;left:0;z-index:2;width:${W1}px;min-width:${W1}px;max-width:${W1}px;${extra}`;
+    const stick2 = (extra = '') => `position:sticky;left:${W1}px;z-index:2;width:${W2}px;min-width:${W2}px;${extra}`;
+    const cell = 'padding:8px 10px;text-align:center;min-width:104px;font-weight:600;border:2px solid #fff';
+    const lab = (extra = '') => `padding:8px 10px;font-weight:700;border:2px solid #fff;${extra}`;
+    const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const head = m.columns.map((c) => `<th style="${nav(cell + ';font-size:12px;vertical-align:top')}">
+        <a href="/fund/${esc(c.fund.fund_id)}/${esc(slug(c.fund.fund_name))}" style="color:#fff;text-decoration:none" title="${esc(c.fund.fund_name)}">${esc(c.fund.fund_name)}</a>
+        <div style="font-weight:400;font-size:10px;opacity:.85;margin-top:2px">${esc(c.fund.amc_name || '')}${c.classLabel ? ` &middot; ${esc(c.classLabel)}` : ''}</div></th>`).join('');
+    const navyRow = (label, cellsHtml, sub) => `<tr><td colspan="2" style="${stick1(nav(lab()))}"><span style="display:block">${label}</span>${sub ? `<span style="font-weight:400;font-size:10px;opacity:.85">${sub}</span>` : ''}</td>${cellsHtml}</tr>`;
+    const infoCells = (fn) => m.columns.map((c) => `<td style="${nav(cell)}">${fn(c)}</td>`).join('');
+    const dataBlock = (title, rows, kind) => rows.map((r, i) => `<tr>
+        ${i === 0 ? `<td rowspan="${rows.length}" style="${stick1(`background:#eaf1e6;color:#3b5a2f;text-align:center;vertical-align:middle;${lab()}`)}">${title}</td>` : ''}
+        <td style="${stick2(`background:#fff;${lab('color:#111')}`)}">${esc(r.label)}</td>
+        ${r.values.map((v) => `<td style="${cell};${heat(v, r.values, kind) || 'background:#fff;color:#111'}">${pct(v)}</td>`).join('')}</tr>`).join('');
+    container.innerHTML = `
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;border:1px solid var(--color-border,#e2e8f0)">
+        <table style="border-collapse:separate;border-spacing:0;font-size:12px;min-width:100%;background:#fff">
+          <thead><tr>
+            <th style="${stick1(nav(lab('text-align:center;vertical-align:middle')))}">Performance &ndash; ${esc(plan)}</th>
+            <th style="${stick2(nav(lab('text-align:center')))}">Period</th>${head}</tr></thead>
+          <tbody>
+            ${navyRow('Inception Date', infoCells((c) => fmtDate(c.fund.inception_date || (c.metrics.first && c.metrics.first.date))))}
+            ${navyRow('Category', infoCells((c) => esc(c.fund.category || '-')))}
+            ${navyRow('AUM (USD)', infoCells((c) => `${fmtUsd(c.fund.aum)}${c.fund.aum_date ? `<div style="font-weight:400;font-size:10px;opacity:.85">as on ${fmtDate(c.fund.aum_date)}</div>` : ''}`))}
+            ${navyRow('Performance As On', infoCells((c) => fmtDate(c.metrics.last && c.metrics.last.date)))}
+            ${dataBlock('ABSOLUTE RETURNS (%)', m.returns, 'returns')}
+            ${dataBlock('VOLATILITY (%) (ANNUALISED SD)', m.volatility, 'volatility')}
+          </tbody>
+        </table>
+      </div>`;
+    return true;
+  }
+
+  return { RETURN_PERIODS, VOLATILITY_PERIODS, metricsFor, buildModel, buildComparison, heat, render, renderComparison, monthsBefore, fmtDate, fmtUsd };
 });

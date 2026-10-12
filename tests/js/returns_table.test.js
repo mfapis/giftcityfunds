@@ -81,4 +81,31 @@ assert.ok(Math.abs(pale(RT.heat(9.78, [9.78, 9.22], 'volatility')) - pale(RT.hea
 assert.ok(/hsl\(142/.test(RT.heat(0, [0, 30], 'volatility')) || /hsl\(14\d/.test(RT.heat(0, [0, 30], 'volatility')));
 assert.ok(/hsl\(4,/.test(RT.heat(30, [5, 30], 'volatility')));                            // the highest volatility is red
 
+
+// ---- the comparison (a column per fund) ----
+{
+  const fund = (id, name, classes, extra = {}) => ({ fund_id: id, fund_name: name, amc_name: 'AMC', category: 'Retail MF', inception_date: '2025-09-18', aum: 5e6, aum_date: '2026-09-30', classes, ...extra });
+  const pts = (n, f) => series('x', [2026, 0, 1], n, f).map((r) => [r.nav_date, r.nav]);
+  const funds = [
+    fund(1, 'Alpha', { Direct: { label: 'Direct', points: pts(200, (i) => 100 + i) }, Regular: { label: 'Regular', points: pts(200, (i) => 100 + 0.9 * i) } }),
+    fund(2, 'Beta', { Direct: { label: 'Class A1', points: pts(150, (i) => 50 + i * 0.1) }, Regular: null }),   // no Regular plan: its headline class is shown
+    fund(3, 'Gamma', { Direct: { label: 'Direct', points: pts(1, () => 10) }, Regular: null }),                 // one NAV: not a series, no column
+  ];
+  const d = RT.buildComparison(funds, 'Direct');
+  assert.deepStrictEqual(d.columns.map((c) => c.fund.fund_name), ['Alpha', 'Beta']);
+  const r = RT.buildComparison(funds, 'Regular');
+  assert.deepStrictEqual(r.columns.map((c) => c.classLabel), ['Regular', 'Class A1']);                         // Beta falls back to its headline class
+  assert.ok(d.returns.every((row) => row.values.length === 2) && d.volatility.every((row) => row.values.length === 2));
+  assert.ok(d.returns.some((row) => row.key === '3M') && !d.returns.some((row) => row.key === '3Y'));
+  assert.strictEqual(RT.buildComparison([], 'Direct').columns.length, 0);
+  // the comparison agrees with the fund's own table for the same class
+  const own = RT.metricsFor(funds[0].classes.Direct.points.map(([date, nav]) => ({ date, nav })));
+  near(d.returns.find((x) => x.key === '1M').values[0], own.returns['1M'], 1e-12);
+  near(d.volatility.find((x) => x.key === 'SI').values[0], own.volatility.SI, 1e-12);
+  assert.strictEqual(RT.fmtDate('2026-09-30'), '30-Sep-26');
+  assert.strictEqual(RT.fmtDate(null), '-');
+  assert.strictEqual(RT.fmtUsd(61200000), '$61.20M');
+  assert.strictEqual(RT.fmtUsd(null), '-');
+}
+
 console.log('ALL returns_table tests passed');

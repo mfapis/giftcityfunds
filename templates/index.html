@@ -275,6 +275,33 @@
   </section>
 
   <!-- ========================================================================= -->
+  <!-- PERFORMANCE COMPARISON: every fund with a live daily NAV, side by side (returns and volatility from daily NAV) -->
+  <!-- ========================================================================= -->
+  <section id="performance" class="py-8 px-4 md:px-8 border-t border-[var(--color-border)]">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-[var(--color-text)] tracking-tight">Performance Comparison</h2>
+          <p class="text-xs text-[var(--color-text-subtle)] mt-0.5">Returns and volatility of every GIFT City fund with a live daily NAV, side by side. <span id="perfCompareNote"></span></p>
+        </div>
+        <div class="inline-flex items-center gap-0.5 p-0.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-subtle)]">
+          <button type="button" data-perf-plan="Direct" class="px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white">Direct</button>
+          <button type="button" data-perf-plan="Regular" class="px-3 py-1 text-xs font-bold rounded text-[var(--color-text-muted)]">Regular</button>
+        </div>
+      </div>
+      <div id="perfCompareBody" class="glass-card rounded-2xl p-1">
+        <div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">Loading performance&hellip;</div>
+      </div>
+      <p class="mt-3 text-[11px] text-[var(--color-text-subtle)]">
+        <b>Returns:</b> under 1 year, absolute (simple point-to-point); 3 and 5 years, and since inception once it is a year or more, annualised (CAGR),
+        calculated from each fund's daily subscription NAV. <b>Volatility:</b> annualised standard deviation of daily NAV returns (&times; &radic;252).
+        A dash means the NAV history does not cover that period. Funds without separate Direct and Regular plans (HDFC India) show their headline class in both views.
+        Scroll sideways to see every fund.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
   <!-- WHY GIFT CITY FUNDS -->
   <!-- ========================================================================= -->
   <section class="py-10 px-4 md:px-8 border-t border-[var(--color-border)] bg-[var(--color-bg-subtle)]/40">
@@ -932,6 +959,8 @@
   </script>
 
   <!-- Main Application Script -->
+  <script src="/static/js/returns_table.js"></script>
+  <script src="/static/js/performance_comparison.js"></script>
   <script src="/static/js/app.js"></script>
   {# PDF export libraries for the onboarding wizard's "Download PDF" button,
      and folio.js itself -- commented out along with the rest of the
