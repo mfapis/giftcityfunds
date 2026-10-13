@@ -17,8 +17,12 @@
       <li><a href="/" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Dashboard</a></li>
       <li><a href="/gift-city-outbound" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/gift-city-outbound' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Outbound Funds</a></li>
       <li><a href="/gift-city-inbound" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/gift-city-inbound' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Inbound Funds</a></li>
+      <li><a href="/#performance" class="block px-5 py-3 transition-colors hover:text-blue-500 hover:bg-[var(--color-card-hover)]">Returns Comparison</a></li>
       <li><a href="/insights" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path.startswith('/insights') else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Insights</a></li>
       <li><a href="/events" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/events' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Events</a></li>
+      <li class="px-5 pt-3 pb-1 text-[10px] font-extrabold uppercase tracking-widest text-[var(--color-text-subtle)]">More</li>
+      <li><a href="/market-intelligence" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/market-intelligence' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Market Intelligence</a></li>
+      <li><a href="/knowledge-hub" class="block px-5 py-3 transition-colors {{ 'text-blue-500 bg-blue-500/5' if request.path == '/knowledge-hub' else 'hover:text-blue-500 hover:bg-[var(--color-card-hover)]' }}">Knowledge Hub</a></li>
     </ul>
 
     <div class="border-t border-[var(--color-border)] p-4 space-y-2 shrink-0">

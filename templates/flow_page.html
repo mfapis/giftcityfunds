@@ -42,23 +42,13 @@
   <!-- ========================================================================= -->
   <!-- NAVIGATION BAR -->
   <!-- ========================================================================= -->
-  <nav class="sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
+  <nav class="site-nav sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <a href="/" class="flex items-center gap-2.5 group">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="GiftCityFunds" class="h-14 w-auto">
       </a>
 
-      <ul class="hidden md:flex items-center gap-6 text-xs font-bold tracking-wide text-[var(--color-text-muted)]">
-        <li><a href="/" class="hover:text-blue-500 transition-colors">Dashboard</a></li>
-        <li>
-          <a href="/gift-city-outbound" class="transition-colors {{ 'text-blue-500' if flow_type == 'outbound' else 'hover:text-blue-500' }}">Outbound Funds</a>
-        </li>
-        <li>
-          <a href="/gift-city-inbound" class="transition-colors {{ 'text-blue-500' if flow_type == 'inbound' else 'hover:text-blue-500' }}">Inbound Funds</a>
-        </li>
-        <li><a href="/insights" class="hover:text-blue-500 transition-colors">Insights</a></li>
-        <li><a href="/events" class="hover:text-blue-500 transition-colors">Events</a></li>
-      </ul>
+      {% include '_nav_links.html' %}
 
       <div class="flex items-center gap-2.5">
         {% include '_lead_form_button.html' %}
@@ -66,14 +56,6 @@
         {% include '_contact_us.html' %}
 
         {% include '_mobile_menu_button.html' %}
-        <div class="theme-switch inline-flex items-center gap-1 p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] shrink-0">
-          <button type="button" id="themeToggleLight" aria-label="Light mode" class="theme-switch-btn active w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          </button>
-          <button type="button" id="themeToggleDark" aria-label="Dark mode" class="theme-switch-btn w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-          </button>
-        </div>
       </div>
     </div>
   </nav>
@@ -113,23 +95,20 @@
   <main class="flex-1 px-4 md:px-8 pb-16">
     <div class="max-w-7xl mx-auto">
 
-      {% if funds %}
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-black text-[var(--color-text)]">{{ funds|length }} Fund{{ 's' if funds|length != 1 else '' }}</h2>
-        <span class="text-[11px] text-[var(--color-text-subtle)]">Classified as {{ flow_type }} from verified factsheet sources or corroborating trackers</span>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-4 mb-14">
-        {% for f in funds %}
+      {% set verified_funds = funds|selectattr('verified')|list %}
+      {% set other_funds = funds|rejectattr('verified')|list %}
+      {% macro fund_card(f) %}
         <div class="bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl p-5 hover:border-blue-500/30 transition-colors">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <div>
+          <div class="flex items-start gap-3 mb-2">
+            <span data-amc-logo="{{ f.amc_name }}" data-size="52" class="shrink-0"></span>
+            <div class="min-w-0">
               <span class="text-[10px] px-2 py-0.5 rounded-full font-bold {{ 'badge-outbound' if flow_type == 'outbound' else 'badge-inbound' }}">
                 {{ 'Outbound Fund' if flow_type == 'outbound' else 'Inbound Fund' }}
               </span>
-              <h3 class="text-base font-bold text-[var(--color-text)] mt-1.5">{{ f.fund_name }}</h3>
+              {% if f.verified %}<span class="verified-badge ml-1"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>Verified</span>{% endif %}
+              <h3 class="text-base font-bold text-[var(--color-text)] mt-1.5"><a href="/fund/{{ f.fund_id }}" class="hover:text-blue-500 transition-colors">{{ f.fund_name }}</a></h3>
               <p class="text-xs text-blue-400 font-semibold">{{ f.amc_name }}</p>
-              <p class="text-[10px] text-[var(--color-text-subtle)] mt-1">{{ 'Verified from official AMC source' if f.source_tier == 'tier1_amc' else 'Sourced from fund directory listing' }}</p>
+              <p class="text-[10px] text-[var(--color-text-subtle)] mt-1">{{ 'Checked against the fund house\'s latest factsheet and notices' if f.verified else 'Directory listing, not independently verified' }}</p>
             </div>
           </div>
 
@@ -160,8 +139,33 @@
             Open Official Source →
           </a>
         </div>
-        {% endfor %}
+      {% endmacro %}
+
+      {% if funds %}
+      {% if verified_funds %}
+      <div class="flex items-end justify-between flex-wrap gap-2 mb-4">
+        <div>
+          <h2 class="text-lg font-black text-[var(--color-text)] flex items-center gap-2">
+            <span class="verified-badge"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>Verified</span>
+            {{ verified_funds|length }} verified fund{{ 's' if verified_funds|length != 1 else '' }}
+          </h2>
+          <p class="text-xs text-[var(--color-text-subtle)] mt-1 max-w-3xl">Checked field by field against the fund house's latest factsheet and notices (as on {{ verified_info.as_of }}): NAV history, expense ratio, minimum investment, exit load, benchmark, holdings and allocations.</p>
+        </div>
       </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-12">
+        {% for f in verified_funds %}{{ fund_card(f) }}{% endfor %}
+      </div>
+      {% endif %}
+
+      {% if other_funds %}
+      <div class="mb-4">
+        <h2 class="text-lg font-black text-[var(--color-text)]">{{ other_funds|length }} other {{ flow_type }} fund{{ 's' if other_funds|length != 1 else '' }}</h2>
+        <p class="text-xs text-[var(--color-text-subtle)] mt-1 max-w-3xl">From public directory listings. Shown as listed; not independently checked against a factsheet.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-14">
+        {% for f in other_funds %}{{ fund_card(f) }}{% endfor %}
+      </div>
+      {% endif %}
       {% else %}
       <div class="chart-placeholder-box p-8 text-center mb-14">
         <span class="text-sm font-bold text-[var(--color-text-muted)]">No {{ flow_type }} funds classified yet</span>
@@ -224,6 +228,14 @@
       if (lightBtn) lightBtn.addEventListener('click', function () { setTheme('light'); });
       if (darkBtn) darkBtn.addEventListener('click', function () { setTheme('dark'); });
     })();
+  </script>
+  <script src="/static/js/amc_logo.js"></script>
+  <script>
+    AmcLogo.ready.then(function () {
+      document.querySelectorAll('[data-amc-logo]').forEach(function (el) {
+        el.innerHTML = AmcLogo.html(el.getAttribute('data-amc-logo'), Number(el.getAttribute('data-size')) || 48);
+      });
+    });
   </script>
   {% include '_analytics.html' %}
   {% include '_lead_form_modal.html' %}

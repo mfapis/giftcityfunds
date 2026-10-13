@@ -1,0 +1,87 @@
+{% extends "base_page.html" %}
+{% block title %}Market Intelligence{% endblock %}
+{% block description %}Live visual breakdown of GIFT City funds by regulatory category, asset manager market share, registration momentum and NAV leaderboard.{% endblock %}
+{% block head_extra %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
+{% block content %}
+  <!-- ========================================================================= -->
+  <!-- VISUAL ANALYTICS SECTION (Chart.js) -->
+  <!-- ========================================================================= -->
+  <section id="analytics" class="py-8 px-4 md:px-8">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-blue-500">Market Intelligence</span>
+          <h2 class="text-xl sm:text-2xl font-black text-[var(--color-text)] tracking-tight">GIFT City Fund Analytics</h2>
+        </div>
+        <p class="text-xs text-[var(--color-text-muted)] max-w-md">
+          Live visual breakdown across regulatory categories, asset management market share, and registration trends.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- Chart 1: Category Distribution -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Fund Categories</h3>
+            <span class="text-[10px] text-[var(--color-text-subtle)]">By Type</span>
+          </div>
+          <div class="relative h-72 w-full flex items-center justify-center">
+            <canvas id="chartCategory"></canvas>
+          </div>
+          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">AIF Cat III, Cat II, Retail Feeders & PMS</span>
+        </div>
+
+        <!-- Chart 2: AMC Distribution -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Top Asset Managers</h3>
+            <span class="text-[10px] text-[var(--color-text-subtle)]">By Count</span>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="chartAmc"></canvas>
+          </div>
+          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">Kotak, DSP, HDFC, PPFAS, Tata, UTI</span>
+        </div>
+
+        <!-- Chart 3: Registration Timeline -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Registration Timeline</h3>
+            <span class="text-[10px] text-[var(--color-text-subtle)]">2022 - 2026</span>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="chartTimeline"></canvas>
+          </div>
+          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">IFSCA Registration Momentum</span>
+        </div>
+
+        <!-- Chart 4: Live NAV Performers -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Active NAV Leaderboard</h3>
+            <span class="text-[10px] text-emerald-400 font-mono font-bold">USD</span>
+          </div>
+          <div class="relative h-72 w-full">
+            <canvas id="chartNav"></canvas>
+          </div>
+          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">HDFC Feeder, DSP, Tata, PPFAS</span>
+        </div>
+
+      </div>
+
+      <div class="text-center mt-8">
+        <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'analytics_section'})" class="btn-blue px-6 py-3 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2">
+          <span>Explore Funds</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/js/amc_logo.js"></script>
+  <script src="/static/js/app.js"></script>
+{% endblock %}

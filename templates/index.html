@@ -73,7 +73,7 @@
   <!-- ========================================================================= -->
   <!-- NAVIGATION BAR (Inspired by GIFT360) -->
   <!-- ========================================================================= -->
-  <nav class="sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
+  <nav class="site-nav sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
@@ -82,21 +82,12 @@
       </a>
 
       <!-- Navigation Links -->
-      <ul class="hidden 2xl:flex items-center gap-3 xl:gap-4 text-xs font-bold tracking-wide text-[var(--color-text-muted)] whitespace-nowrap shrink-0 min-w-0">
-        <li><a href="#dashboard" class="hover:text-blue-500 transition-colors flex items-center gap-1">Dashboard</a></li>
-        <li><a href="#screener" class="hover:text-blue-500 transition-colors flex items-center gap-1">Screener</a></li>
-        <li><a href="/gift-city-outbound" class="hover:text-blue-500 transition-colors flex items-center gap-1">Outbound Funds</a></li>
-        <li><a href="/gift-city-inbound" class="hover:text-blue-500 transition-colors flex items-center gap-1">Inbound Funds</a></li>
-        <li><a href="#amcs" class="hover:text-blue-500 transition-colors flex items-center gap-1">AMCs</a></li>
-        <li><a href="#knowledge" class="hover:text-blue-500 transition-colors flex items-center gap-1">Knowledge Hub</a></li>
-        <li><a href="/insights" class="hover:text-blue-500 transition-colors flex items-center gap-1">Insights</a></li>
-        <li><a href="/events" class="hover:text-blue-500 transition-colors flex items-center gap-1">Events</a></li>
-      </ul>
+      {% include '_nav_links.html' %}
 
       <!-- Action Area -->
       <div class="flex items-center gap-1 xl:gap-1.5 shrink-0 ml-auto min-w-0">
         <!-- Quick Search -->
-        <div class="relative hidden 2xl:block w-36 shrink-0">
+        <div class="relative hidden 2xl:block w-48 shrink-0">
           <input type="text" id="navQuickSearch" placeholder="Search funds..." class="w-full bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl px-3 py-1.5 text-xs text-[var(--color-text)] placeholder-[var(--color-text-subtle)] focus:outline-none focus:border-blue-500 transition-all" />
           <span class="absolute right-2.5 top-2 text-[10px] text-[var(--color-text-subtle)]">⌘K</span>
         </div>
@@ -105,18 +96,9 @@
 
         {% include '_contact_us.html' %}
 
-        {% set mobile_menu_breakpoint = '2xl' %}
         {% include '_mobile_menu_button.html' %}
 
         <!-- Dark/Light Theme Toggle -->
-        <div class="theme-switch inline-flex items-center gap-1 p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] shrink-0">
-          <button type="button" id="themeToggleLight" aria-label="Light mode" class="theme-switch-btn active w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          </button>
-          <button type="button" id="themeToggleDark" aria-label="Dark mode" class="theme-switch-btn w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-          </button>
-        </div>
 
         {# Onboard Investor CTA (Folio Creation Flow) -- commented out for now, not deleted
         <button id="navOnboardBtn" type="button" class="btn-blue text-xs px-2 xl:px-3 py-1.5 rounded-lg flex items-center gap-1 xl:gap-1.5 shadow-sm whitespace-nowrap shrink-0">
@@ -168,109 +150,79 @@
   <!-- ========================================================================= -->
   <!-- HERO SECTION -->
   <!-- ========================================================================= -->
-  <header id="dashboard" class="relative pt-8 pb-12 px-4 md:px-8 overflow-hidden bg-gradient-to-b from-blue-900/10 via-transparent to-transparent">
-    <!-- Ambient Glow Background -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none"></div>
-
+  <header id="dashboard" class="px-4 md:px-8 pt-10 pb-6">
     <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-12 gap-8 items-center">
-        
-        <!-- Left Hero Content -->
-        <div class="lg:col-span-7 space-y-4 text-left">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs font-bold tracking-wide">
-            <span class="w-2 h-2 rounded-full bg-gcf-neon animate-pulse"></span>
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+
+        <!-- Left: pitch -->
+        <div class="space-y-5">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-[var(--color-text-muted)] text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             IFSCA Compliant Data Engine (75 Active Funds)
-          </div>
-
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--color-text)] leading-tight">
-            India's First <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-emerald-400">GIFT City IFSC</span> Funds Platform
+          </span>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-[var(--color-text)] leading-[1.1]">
+            India's First <span class="text-blue-600">GIFT City IFSC</span> Funds Platform
           </h1>
-
-          <p class="text-sm sm:text-base text-[var(--color-text-muted)] max-w-xl font-normal leading-relaxed">
+          <p class="text-base text-[var(--color-text-muted)] max-w-lg leading-relaxed">
             Real-time NAV, expense ratios, portfolio analytics, and statutory fund intelligence. Track inbound feeder funds, Category II & III AIFs, and global asset managers operating in GIFT City.
           </p>
-
-          <div class="flex flex-wrap gap-3 pt-2">
-            <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_primary'})" class="btn-blue px-6 py-3 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2">
+          <div class="flex flex-wrap gap-3 pt-1">
+            <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_primary'})" class="btn-blue px-6 py-3 rounded-xl text-sm inline-flex items-center gap-2">
               <span>Explore Funds</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
             </a>
-            <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_secondary'})" class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold border border-[var(--color-border-strong)] bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)] transition-all">
+            <a href="#performance" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_secondary'})" class="px-6 py-3 rounded-xl text-sm font-bold border border-[var(--color-border-strong)] bg-[var(--color-card)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)] transition-all">
               Compare Funds
             </a>
           </div>
         </div>
 
-        <!-- Right Hero Metrics & Spotlight Card -->
-        <div class="lg:col-span-5 grid grid-cols-2 gap-3 sm:gap-4">
-          
-          <!-- Metric Card 1 -->
-          <div class="glass-card rounded-2xl p-4 sm:p-5 relative overflow-hidden group">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-subtle)]">Tracked Funds</span>
-              <div class="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-              </div>
-            </div>
-            <div id="statTotalFunds" class="text-2xl sm:text-3xl font-black text-[var(--color-text)] font-mono">71</div>
-            <span class="text-[10px] text-emerald-400 font-bold mt-1 inline-block">100% Verified IFSC Scope</span>
+        <!-- Right: live funds -->
+        <div class="rounded-3xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
+            <h2 class="text-base font-extrabold text-[var(--color-text)]">Funds with a live NAV</h2>
+            <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_preview_view_all'})" class="text-xs font-bold text-blue-600 hover:underline">View all →</a>
           </div>
-
-          <!-- Metric Card 2 -->
-          <div class="glass-card rounded-2xl p-4 sm:p-5 relative overflow-hidden group">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-subtle)]">Flow Classified</span>
-              <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              </div>
-            </div>
-            <div id="statTier1" class="text-2xl sm:text-3xl font-black text-[var(--color-text)] font-mono">23</div>
-            <span class="text-[10px] text-blue-400 font-bold mt-1 inline-block">Outbound / Inbound</span>
+          <div id="heroFundPreview">
+            <div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">Loading funds…</div>
           </div>
-
-          <!-- Metric Card 3 -->
-          <div class="glass-card rounded-2xl p-4 sm:p-5 relative overflow-hidden group">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-subtle)]">Active AMCs</span>
-              <div class="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-              </div>
-            </div>
-            <div id="statTotalAmcs" class="text-2xl sm:text-3xl font-black text-[var(--color-text)] font-mono">20+</div>
-            <span class="text-[10px] text-[var(--color-text-muted)] font-medium mt-1 inline-block">Fund Managers</span>
-          </div>
-
-          <!-- Metric Card 4 -->
-          <div class="glass-card rounded-2xl p-4 sm:p-5 relative overflow-hidden group">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-subtle)]">Live USD NAVs</span>
-              <div class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-              </div>
-            </div>
-            <div id="statLiveNav" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">16</div>
-            <span class="text-[10px] text-amber-400 font-bold mt-1 inline-block">Daily Feeder Updates</span>
-          </div>
-
         </div>
+      </div>
 
+      <!-- Stat strip -->
+      <div class="mt-8 grid grid-cols-2 md:grid-cols-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] divide-y md:divide-y-0 md:divide-x divide-[var(--color-border)]">
+        <div class="p-5"><div class="text-xs font-semibold text-[var(--color-text-subtle)]">Tracked funds</div><div id="statTotalFunds" class="text-2xl font-extrabold text-[var(--color-text)] mt-1">&ndash;</div></div>
+        <div class="p-5"><div class="text-xs font-semibold text-[var(--color-text-subtle)]">Outbound and inbound</div><div id="statTier1" class="text-2xl font-extrabold text-[var(--color-text)] mt-1">&ndash;</div></div>
+        <div class="p-5"><div class="text-xs font-semibold text-[var(--color-text-subtle)]">Fund houses</div><div id="statTotalAmcs" class="text-2xl font-extrabold text-[var(--color-text)] mt-1">&ndash;</div></div>
+        <div class="p-5"><div class="text-xs font-semibold text-[var(--color-text-subtle)]">Funds with a NAV</div><div id="statLiveNav" class="text-2xl font-extrabold text-emerald-600 mt-1">&ndash;</div></div>
       </div>
     </div>
   </header>
 
   <!-- ========================================================================= -->
-  <!-- HERO FUND DISCOVERY PREVIEW -- shows real funds immediately, before the -->
-  <!-- analytics charts, since visitors are already visiting fund pages.       -->
+  <!-- PERFORMANCE COMPARISON: every fund with a live daily NAV, side by side (returns and volatility from daily NAV) -->
   <!-- ========================================================================= -->
-  <section class="py-8 px-4 md:px-8 border-t border-[var(--color-border)]">
+  <section id="performance" class="py-8 px-4 md:px-8 border-t border-[var(--color-border)]">
     <div class="max-w-7xl mx-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg sm:text-xl font-black text-[var(--color-text)] tracking-tight">Explore GIFT City Funds</h2>
-        <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'hero_preview_view_all'})" class="text-xs font-bold text-blue-500 hover:underline shrink-0">View all funds →</a>
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-[var(--color-text)] tracking-tight">Performance Comparison</h2>
+          <p class="text-xs text-[var(--color-text-subtle)] mt-0.5">Returns and volatility of every GIFT City fund with a live daily NAV, side by side. <span id="perfCompareNote"></span></p>
+        </div>
+        <div class="inline-flex items-center gap-0.5 p-0.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-subtle)]">
+          <button type="button" data-perf-plan="Direct" class="px-3 py-1 text-xs font-bold rounded bg-blue-600 text-white">Direct</button>
+          <button type="button" data-perf-plan="Regular" class="px-3 py-1 text-xs font-bold rounded text-[var(--color-text-muted)]">Regular</button>
+        </div>
       </div>
-      <div id="heroFundPreview" class="glass-card rounded-2xl overflow-hidden">
-        <div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">Loading funds…</div>
+      <div id="perfCompareBody" class="glass-card rounded-2xl p-1">
+        <div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">Loading performance&hellip;</div>
       </div>
+      <p class="mt-3 text-[11px] text-[var(--color-text-subtle)]">
+        <b>Returns:</b> under 1 year, absolute (simple point-to-point); 3 and 5 years, and since inception once it is a year or more, annualised (CAGR),
+        calculated from each fund's daily subscription NAV. <b>Volatility:</b> annualised standard deviation of daily NAV returns (&times; &radic;252).
+        A dash means the NAV history does not cover that period. Funds without separate Direct and Regular plans (HDFC India) show their headline class in both views.
+        Scroll sideways to see every fund.
+      </p>
     </div>
   </section>
 
@@ -318,83 +270,6 @@
     </div>
   </section>
 
-  <!-- ========================================================================= -->
-  <!-- VISUAL ANALYTICS SECTION (Chart.js) -->
-  <!-- ========================================================================= -->
-  <section id="analytics" class="py-8 px-4 md:px-8 border-t border-[var(--color-border)] bg-[var(--color-bg-subtle)]/40">
-    <div class="max-w-7xl mx-auto">
-      
-      <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-6">
-        <div>
-          <span class="text-xs font-extrabold uppercase tracking-widest text-blue-500">Market Intelligence</span>
-          <h2 class="text-xl sm:text-2xl font-black text-[var(--color-text)] tracking-tight">GIFT City Fund Analytics</h2>
-        </div>
-        <p class="text-xs text-[var(--color-text-muted)] max-w-md">
-          Live visual breakdown across regulatory categories, asset management market share, and registration trends.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-        <!-- Chart 1: Category Distribution -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Fund Categories</h3>
-            <span class="text-[10px] text-[var(--color-text-subtle)]">By Type</span>
-          </div>
-          <div class="relative h-72 w-full flex items-center justify-center">
-            <canvas id="chartCategory"></canvas>
-          </div>
-          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">AIF Cat III, Cat II, Retail Feeders & PMS</span>
-        </div>
-
-        <!-- Chart 2: AMC Distribution -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Top Asset Managers</h3>
-            <span class="text-[10px] text-[var(--color-text-subtle)]">By Count</span>
-          </div>
-          <div class="relative h-72 w-full">
-            <canvas id="chartAmc"></canvas>
-          </div>
-          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">Kotak, DSP, HDFC, PPFAS, Tata, UTI</span>
-        </div>
-
-        <!-- Chart 3: Registration Timeline -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Registration Timeline</h3>
-            <span class="text-[10px] text-[var(--color-text-subtle)]">2022 - 2026</span>
-          </div>
-          <div class="relative h-72 w-full">
-            <canvas id="chartTimeline"></canvas>
-          </div>
-          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">IFSCA Registration Momentum</span>
-        </div>
-
-        <!-- Chart 4: Live NAV Performers -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Active NAV Leaderboard</h3>
-            <span class="text-[10px] text-emerald-400 font-mono font-bold">USD</span>
-          </div>
-          <div class="relative h-72 w-full">
-            <canvas id="chartNav"></canvas>
-          </div>
-          <span class="text-[10px] text-[var(--color-text-subtle)] text-center block mt-2">HDFC Feeder, DSP, Tata, PPFAS</span>
-        </div>
-
-      </div>
-
-      <div class="text-center mt-8">
-        <a href="#screener" onclick="window.gaTrack && window.gaTrack('Explore Funds', {location: 'analytics_section'})" class="btn-blue px-6 py-3 rounded-xl text-xs sm:text-sm inline-flex items-center gap-2">
-          <span>Explore Funds</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-        </a>
-      </div>
-
-    </div>
-  </section>
 
   <!-- ========================================================================= -->
   <!-- FUND SCREENER & DATA TABLE SECTION -->
@@ -413,10 +288,23 @@
         </span>
         <!-- Table/Grid toggle -->
         <div class="flex rounded-lg border border-[var(--color-border)] p-0.5 bg-[var(--color-card)]">
-          <button id="btnViewTable" class="px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white transition-all">Table</button>
-          <button id="btnViewGrid" class="px-2.5 py-1 text-xs font-bold rounded text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all">Cards</button>
+          <button id="btnViewTable" class="px-2.5 py-1 text-xs font-bold rounded text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-all">Table</button>
+          <button id="btnViewGrid" class="px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white transition-all">Cards</button>
         </div>
       </div>
+    </div>
+
+    <!-- Verified / other split: the verified funds are checked against the fund house's latest factsheet and notices -->
+    <div class="mb-4">
+      <div class="inline-flex p-1 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)]" role="tablist">
+        <button type="button" data-verified-tab="verified" class="verified-tab is-active">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>
+          Verified <span class="verified-count"></span>
+        </button>
+        <button type="button" data-verified-tab="other" class="verified-tab">Other funds <span class="other-count"></span></button>
+        <button type="button" data-verified-tab="all" class="verified-tab">All <span class="all-count"></span></button>
+      </div>
+      <p id="verifiedNote" class="mt-2 text-xs text-[var(--color-text-subtle)] max-w-3xl"></p>
     </div>
 
     <!-- Category Tabs -->
@@ -472,7 +360,7 @@
     </div>
 
     <!-- Table View -->
-    <div id="fundsTableWrapper" class="glass-card rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-xl">
+    <div id="fundsTableWrapper" class="hidden glass-card rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-xl">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -495,7 +383,7 @@
     </div>
 
     <!-- Grid Card View (Hidden by default) -->
-    <div id="fundsCardsContainer" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div id="fundsCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Rendered dynamically by app.js -->
     </div>
 
@@ -526,53 +414,6 @@
     </div>
   </section>
 
-  <!-- ========================================================================= -->
-  <!-- KNOWLEDGE HUB & IFSCA FAQ SECTION -->
-  <!-- ========================================================================= -->
-  <section id="knowledge" class="py-12 px-4 md:px-8 max-w-5xl mx-auto">
-    <div class="text-center mb-8">
-      <span class="text-xs font-extrabold uppercase tracking-widest text-blue-500">Knowledge Hub</span>
-      <h2 class="text-2xl font-black text-[var(--color-text)] tracking-tight">GIFT City IFSC Regulatory 101</h2>
-      <p class="text-xs text-[var(--color-text-muted)] mt-1">Understanding the regulatory, structural, and tax advantages of investing in IFSC vehicles.</p>
-    </div>
-
-    <div class="space-y-3">
-      
-      <!-- FAQ 1 -->
-      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
-        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
-          <span>What is the difference between Retail Feeder Funds and Institutional AIFs in GIFT City?</span>
-          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </button>
-        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
-          Retail feeder funds (such as HDFC’s Invest in India share classes) allow global retail investors to invest with smaller ticket sizes ($500+) and publish regular daily USD NAVs. In contrast, Category II and III Alternative Investment Funds (AIFs) are institutional structures with a mandatory minimum investment ticket of <strong>$150,000 USD</strong>, tailored for HNIs, family offices, and institutions.
-        </div>
-      </div>
-
-      <!-- FAQ 2 -->
-      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
-        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
-          <span>Why do several institutional AIFs have NULL public NAVs?</span>
-          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </button>
-        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
-          Under statutory IFSCA regulations, private AIFs are not legally required to publish open public NAVs on distributor websites. Instead, NAV statements, capital call accounts, and portfolio performance are distributed privately to registered unit holders. Our platform transparently documents this statutory standard rather than using fabricated figures.
-        </div>
-      </div>
-
-      <!-- FAQ 3 -->
-      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
-        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
-          <span>What tax advantages apply to foreign investors allocating to GIFT City funds?</span>
-          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </button>
-        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
-          Non-resident investors in GIFT City IFSC enjoy a 100% tax exemption on capital gains arising from the transfer of offshore securities, zero GST on fund management fees, and simplified non-PAN tax compliance under Section 47 and Section 10(4D) of the Indian Income Tax Act.
-        </div>
-      </div>
-
-    </div>
-  </section>
 
   <!-- ========================================================================= -->
   <!-- FLOATING COMPARE DRAWER -->
@@ -858,7 +699,7 @@
         <div class="flex items-center gap-6 text-[var(--color-text-muted)] font-medium">
           <a href="#dashboard" class="hover:text-blue-400">Dashboard</a>
           <a href="#screener" class="hover:text-blue-400">Fund Screener</a>
-          <a href="#analytics" class="hover:text-blue-400">Analytics</a>
+          <a href="/market-intelligence" class="hover:text-blue-400">Market Intelligence</a>
         </div>
       </div>
 
@@ -932,6 +773,9 @@
   </script>
 
   <!-- Main Application Script -->
+  <script src="/static/js/amc_logo.js"></script>
+  <script src="/static/js/returns_table.js"></script>
+  <script src="/static/js/performance_comparison.js"></script>
   <script src="/static/js/app.js"></script>
   {# PDF export libraries for the onboarding wizard's "Download PDF" button,
      and folio.js itself -- commented out along with the rest of the

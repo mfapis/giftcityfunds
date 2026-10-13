@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   const themeToggleLight = document.getElementById('themeToggleLight');
   const themeToggleDark = document.getElementById('themeToggleDark');
-  const storedTheme = localStorage.getItem('gcf-theme') || 'light';
+  const storedTheme = 'light';
 
   function applyTheme(theme) {
     if (theme === 'light') {
@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   // NAV Chart
   // --------------------------------------------------------------------------
-  const NAV_RANGES = ['YTD', '1M', '3M', '1Y', '3Y', '5Y', 'ALL'];
+  const NAV_RANGES = ['1M', '3M', '6M', 'YTD', '1Y', '3Y', '5Y', 'ALL'];
 
   // Filters the fund's full recorded NAV history down to a time-range tab.
   // With sparse real data (most funds have 1-2 recorded points so far),
@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (range === 'YTD') {
       cutoff = new Date(now.getFullYear(), 0, 1);
     } else {
-      const monthsBack = { '1M': 1, '3M': 3, '1Y': 12, '3Y': 36, '5Y': 60 }[range] || 0;
+      const monthsBack = { '1M': 1, '3M': 3, '6M': 6, '1Y': 12, '3Y': 36, '5Y': 60 }[range] || 0;
       cutoff = new Date(now);
       cutoff.setMonth(cutoff.getMonth() - monthsBack);
     }
@@ -660,20 +660,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function setActiveRangeTab(range) {
     document.querySelectorAll('.nav-range-tab').forEach(btn => {
       const isActive = btn.getAttribute('data-range') === range;
-      btn.classList.toggle('bg-blue-600', isActive);
-      btn.classList.toggle('text-white', isActive);
-      btn.classList.toggle('text-[var(--color-text-muted)]', !isActive);
+      btn.classList.toggle('is-active', isActive);
     });
   }
 
   function updateNavChart(range) {
     state.navRange = range;
     setActiveRangeTab(range);
-    const filtered = filterHistoryByRange(state.fullNavHistory, range);
-    const emptyMessage = (state.fullNavHistory && state.fullNavHistory.length > 0 && filtered.length === 0)
-      ? `No NAV snapshots recorded within the last ${range === 'YTD' ? 'year-to-date' : range.toLowerCase()} window -- try a wider range.`
-      : null;
-    renderNavChart(state.currentModalFund, filtered, emptyMessage);
+    const history = state.fullNavHistory || [];
+    const empty = document.getElementById('navEmptyNote');
+    const drawn = window.NavChart && window.NavChart.render({
+      canvas: document.getElementById('modalNavCanvas'),
+      legend: document.getElementById('navLegend'),
+      note: document.getElementById('navChartNote'),
+      history,
+      range,
+      isLight: document.documentElement.classList.contains('light'),
+      currency: (state.currentModalFund && state.currentModalFund.currency) || 'USD',
+    });
+    if (empty) {
+      empty.classList.toggle('hidden', !!drawn);
+      empty.textContent = history.length
+        ? `No NAV recorded in the ${range === 'YTD' ? 'year-to-date' : range.toLowerCase()} window. Try a wider range.`
+        : 'No NAV history recorded yet for this fund. The trend builds up here as the data pipeline runs.';
+    }
   }
 
   // Soft top-to-bottom fade under the NAV line -- cool cyan-blue at the top,
@@ -846,6 +856,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   // Load the fund
   // --------------------------------------------------------------------------
+  // Returns and volatility per share class from the daily NAV; the section stays hidden when no class has a usable history.
+  function renderReturnsTable(f, history) {
+    const section = document.getElementById('modalReturnsSection');
+    const body = document.getElementById('modalReturnsBody');
+    if (!section || !body || !window.ReturnsTable) return;
+    const shown = window.ReturnsTable.render(body, history, {
+      category: f.category, aum: f.aum, aumCurrency: f.aum_currency, aumDate: f.aum_date,
+    });
+    section.classList.toggle('hidden', !shown);
+  }
+
   async function loadFund() {
     const fundId = window.GIFT_FUND_ID;
     try {
@@ -854,6 +875,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!data.success) return;
 
       const f = data.fund;
+      const vBox = document.getElementById('fundVerifiedBadge');
+      if (vBox) vBox.innerHTML = f.verified
+        ? '<span class="verified-badge"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>Verified data</span>'
+        : '<span class="unverified-badge" title="Shown as listed; not independently checked against a factsheet">Directory listing, not verified</span>';
+      const logoBox = document.getElementById('fundHeaderLogo');
+      if (logoBox && window.AmcLogo) { await window.AmcLogo.ready; logoBox.innerHTML = window.AmcLogo.html(f.amc_name, 88, 'amc-logo-lg'); }
       state.currentModalFund = { id: f.fund_id, name: f.fund_name, nav: f.nav, currency: f.nav_currency || 'USD' };
       document.title = `${f.fund_name} | GIFT360`;
       setupBuyPanel(f);
@@ -939,6 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       state.fullNavHistory = navHistory;
       updateNavChart(state.navRange || 'ALL');
+      renderReturnsTable(f, navHistory);
     } catch (e) {
       console.error('Error loading fund detail page:', e);
     }

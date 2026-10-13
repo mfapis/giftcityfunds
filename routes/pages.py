@@ -22,7 +22,7 @@ from content.events import EVENTS
 from content.faqs import FAQ_SOURCE_ATTRIBUTION, INBOUND_FAQS, OUTBOUND_FAQS
 from content.insights import ARTICLES, CATEGORIES, get_article, related_articles
 from routes.auth import login_required
-from services import adapters
+from services import adapters, verified
 from services.funds import slugify
 from services.mf_engine import MfEngineError, fetch_funds
 
@@ -49,6 +49,18 @@ def index():
     return render_template("index.html")
 
 
+@pages_bp.route("/market-intelligence")
+def market_intelligence():
+    """Fund categories, top asset managers, registration timeline and NAV leaderboard (the charts read /api/stats)."""
+    return render_template("market_intelligence.html")
+
+
+@pages_bp.route("/knowledge-hub")
+def knowledge_hub():
+    """GIFT City IFSC regulatory 101: the FAQ accordion."""
+    return render_template("knowledge_hub.html")
+
+
 @pages_bp.route("/gift-city-outbound")
 def gift_city_outbound():
     """Dedicated page for outbound GIFT City funds (India/GIFT-domiciled
@@ -61,6 +73,7 @@ def gift_city_outbound():
         page_title="GIFT City Outbound Funds",
         page_subtitle="India/GIFT-domiciled capital investing abroad — AIFs, PMS, and retail fund strategies for global investing.",
         funds=funds,
+        verified_info=verified.info(),
         data_unavailable=data_unavailable,
         faqs=OUTBOUND_FAQS,
         faq_source=FAQ_SOURCE_ATTRIBUTION,
@@ -81,6 +94,7 @@ def gift_city_inbound():
         page_title="GIFT City Inbound Funds",
         page_subtitle="Foreign and NRI capital investing into India through GIFT City IFSC — fund houses, strategies, and tax structure.",
         funds=funds,
+        verified_info=verified.info(),
         data_unavailable=data_unavailable,
         faqs=INBOUND_FAQS,
         faq_source=FAQ_SOURCE_ATTRIBUTION,
@@ -222,6 +236,8 @@ def sitemap_xml():
         (url_for("pages.gift_city_inbound", _external=True), "0.9", "daily"),
         (url_for("pages.insights_index", _external=True), "0.9", "daily"),
         (url_for("pages.events_index", _external=True), "0.7", "weekly"),
+        (url_for("pages.market_intelligence", _external=True), "0.7", "daily"),
+        (url_for("pages.knowledge_hub", _external=True), "0.6", "monthly"),
     ]
     article_urls = [
         (url_for("pages.insight_detail", slug=a["slug"], _external=True), "0.7", "monthly")

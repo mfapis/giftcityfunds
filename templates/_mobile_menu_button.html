@@ -1,11 +1,10 @@
 <!-- Mobile nav hamburger -- shown only at the breakpoint where this page's
      inline nav links are hidden (pass mobile_menu_breakpoint before the
-     include; defaults to 'md', matching most pages -- index.html sets it
-     to '2xl' since its own link list only shows above that). The drawer
+     include; defaults to 'xl', where the shared link list in _nav_links.html appears). The drawer
      itself lives in _mobile_menu_panel.html, included right before
      </body> -- not here -- for the same reason as _lead_form_modal.html:
      nav's backdrop-blur-md breaks position:fixed containment for anything
      nested inside <nav>. -->
-<button type="button" id="mobileMenuBtn" aria-label="Open menu" class="{{ mobile_menu_breakpoint|default('md') }}:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-blue-500 hover:border-blue-500/40 transition-colors shrink-0">
+<button type="button" id="mobileMenuBtn" aria-label="Open menu" class="{{ mobile_menu_breakpoint|default('xl') }}:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-blue-500 hover:border-blue-500/40 transition-colors shrink-0">
   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
 </button>

@@ -40,7 +40,7 @@ from typing import Any, Dict, List
 from flask import Blueprint, Response, jsonify, request, session
 
 from routes.auth import login_required
-from services import adapters
+from services import adapters, performance, verified
 from services.demo_db import DemoDbError, execute, fetch_all, get_db_connection
 from services.leads import submit_lead, validate_lead
 from services.mf_engine import MfEngineError, fetch_fund, fetch_funds
@@ -128,6 +128,7 @@ def get_funds():
         "success": True,
         "count": len(funds),
         "funds": funds,
+        "verified_info": verified.info(),
     })
 
 
@@ -166,6 +167,19 @@ def get_fund_nav_history(fund_id: int):
         "count": len(history),
         "nav_history": history,
     })
+
+
+@api_bp.route("/performance-comparison")
+def performance_comparison():
+    """Every fund with a live daily NAV, one column each, with the NAV series of its Direct (or headline) and Regular share classes. The
+    page calculates returns and volatility from them. Cached for 15 minutes."""
+    try:
+        data = performance.get_comparison()
+    except MfEngineError as exc:
+        return _api_error(exc)
+    response = jsonify({"success": True, **data})
+    response.headers["Cache-Control"] = "public, max-age=300, s-maxage=900, stale-while-revalidate=3600"
+    return response
 
 
 @api_bp.route("/compare")

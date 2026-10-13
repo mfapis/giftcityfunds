@@ -14,13 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
     searchQuery: '',
     tierFilter: 'all',
     categoryFilter: 'all',
+    verifiedTab: 'verified', // 'verified' | 'other' | 'all' -- the checked funds first
+    verifiedInfo: null,
     currencyFilter: 'ALL',
     navFilter: 'all',
     sortBy: 'nav',
     sortOrder: 'desc',
     currentPage: 1,
     pageSize: 15,
-    viewMode: 'table', // 'table' or 'grid'
+    viewMode: 'grid', // 'table' or 'grid' -- cards (logo on top, name below) are the default
     charts: {},
   };
 
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   const themeToggleLight = document.getElementById('themeToggleLight');
   const themeToggleDark = document.getElementById('themeToggleDark');
-  const storedTheme = localStorage.getItem('gcf-theme') || 'light';
+  const storedTheme = 'light';
 
   function applyTheme(theme) {
     if (theme === 'light') {
@@ -64,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   async function init() {
     try {
+      if (window.AmcLogo) await window.AmcLogo.ready;
       await Promise.all([fetchStats(), fetchFunds()]);
       setupEventListeners();
     } catch (err) {
@@ -93,8 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (data.success) {
         state.allFunds = data.funds;
+        state.verifiedInfo = data.verified_info || null;
         applyFilters();
         renderHeroFundPreview(data.funds);
+        updateVerifiedTabs();
         updateCategoryTabCounts();
       }
     } catch (e) {
@@ -108,17 +113,45 @@ document.addEventListener('DOMContentLoaded', () => {
   // is added or removed. Uses the same substring-match logic as
   // applyFilters()'s category filter so a tab's count always matches what
   // clicking it actually shows.
+  // Verified / Other / All tabs: counts and the one-line explanation under them.
+  function updateVerifiedTabs() {
+    const ok = state.allFunds.filter(f => f.verified).length;
+    const set = (sel, n) => document.querySelectorAll(sel).forEach(el => { el.textContent = `(${n})`; });
+    set('.verified-count', ok);
+    set('.other-count', state.allFunds.length - ok);
+    set('.all-count', state.allFunds.length);
+    document.querySelectorAll('.verified-tab').forEach(b => b.classList.toggle('is-active', b.getAttribute('data-verified-tab') === state.verifiedTab));
+    const note = document.getElementById('verifiedNote');
+    if (!note) return;
+    const info = state.verifiedInfo || {};
+    note.textContent = state.verifiedTab === 'verified'
+      ? `These ${ok} funds are checked field by field against ${info.basis ? info.basis.toLowerCase() : "each fund house's latest factsheet and notices"} (as on ${info.as_of || 'the last check'}): NAV history, expense ratio, minimum investment, exit load, benchmark, holdings and allocations.`
+      : state.verifiedTab === 'other'
+        ? 'These funds come from public directory listings. Their details are shown as listed and are not independently checked against a factsheet.'
+        : 'Verified funds are marked with a green tick. All other funds are directory listings that are not independently checked.';
+  }
+
+  function verifiedBadge(f) {
+    return f && f.verified
+      ? '<span class="verified-badge" title="Checked against the fund house\'s latest factsheet and notices"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd"/></svg>Verified</span>'
+      : '';
+  }
+
   function updateCategoryTabCounts() {
     document.querySelectorAll('.cat-filter-btn').forEach(btn => {
       const countEl = btn.querySelector('.cat-count');
       if (!countEl) return;
       const cat = btn.getAttribute('data-category');
+      const pool = state.verifiedTab === 'verified' ? state.allFunds.filter(f => f.verified)
+        : state.verifiedTab === 'other' ? state.allFunds.filter(f => !f.verified) : state.allFunds;
       const count = cat === 'all'
-        ? state.allFunds.length
-        : state.allFunds.filter(f => f.category && f.category.toLowerCase().includes(cat.toLowerCase())).length;
+        ? pool.length
+        : pool.filter(f => f.category && f.category.toLowerCase().includes(cat.toLowerCase())).length;
       countEl.textContent = `(${count})`;
     });
   }
+
+  const amcLogo = (name, size) => (window.AmcLogo ? window.AmcLogo.html(name, size) : '');
 
   // Real, live fund data shown right under the hero -- not a hardcoded
   // sample list, so it always reflects whatever's actually in the API.
@@ -131,15 +164,17 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<div class="p-6 text-center text-xs text-[var(--color-text-subtle)]">No funds available right now.</div>';
       return;
     }
-    const withNav = funds.filter(f => f.nav != null);
-    const preview = (withNav.length ? withNav : funds).slice(0, 3);
+    const withNav = funds.filter(f => f.nav != null && f.verified);
+    // newest NAV date first, so the funds shown are the ones with a current daily NAV
+    const preview = [...(withNav.length ? withNav : funds)].sort((x, y) => String(y.nav_as_of || '').localeCompare(String(x.nav_as_of || ''))).slice(0, 4);
 
     const rows = preview.map(f => {
       const slug = slugify(f.fund_name);
       const navText = f.nav != null ? `${Number(f.nav).toFixed(2)} ${f.nav_currency || 'USD'}` : '—';
       return `
         <a href="/fund/${f.fund_id}/${slug}" class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 hover:bg-[var(--color-card-hover)] transition-colors border-b border-[var(--color-border)] last:border-b-0">
-          <div class="min-w-0">
+          ${amcLogo(f.amc_name, 40)}
+          <div class="min-w-0 flex-1">
             <div class="text-xs sm:text-sm font-bold text-[var(--color-text)] truncate">${escapeHtml(f.fund_name)}</div>
             <div class="text-[10px] sm:text-[11px] text-[var(--color-text-subtle)] truncate">${escapeHtml(f.category || 'Unclassified')} · ${escapeHtml(f.amc_name || '')}</div>
           </div>
@@ -218,9 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const shortName = shortenAmcName(a.amc);
       return `
         <div class="glass-card rounded-2xl p-4 text-center flex flex-col items-center justify-between" title="${escapeHtml(a.amc)}">
-          <div class="w-12 h-12 rounded-xl ${color.bg} border ${color.border} flex items-center justify-center font-bold ${color.text} text-xs mb-2">
-            ${escapeHtml(amcBadgeInitials(a.amc))}
-          </div>
+          <div class="mb-2">${amcLogo(a.amc, 52)}</div>
           <span class="font-bold text-xs text-[var(--color-text)]">${escapeHtml(shortName)}</span>
           <span class="text-[10px] text-[var(--color-text-subtle)]">${a.count} GIFT Fund${a.count === 1 ? '' : 's'}</span>
         </div>
@@ -238,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     performers.forEach(p => {
       itemsHtml += `
         <span class="inline-flex items-center gap-2 mx-6 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          ${amcLogo(p.amc_name || p.amc || p.fund_name, 22)}
           <span class="text-[var(--color-text)]">${escapeHtml(p.fund_name)}</span>
           <span class="text-emerald-400 font-mono font-bold">${p.nav} ${p.nav_currency || 'USD'}</span>
           <span class="text-[var(--color-text-subtle)] text-[10px]">(${p.nav_as_of || 'Live'})</span>
@@ -498,6 +531,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Verified / other
+    if (state.verifiedTab === 'verified') result = result.filter(f => f.verified);
+    else if (state.verifiedTab === 'other') result = result.filter(f => !f.verified);
+
     // Category filter
     if (state.categoryFilter !== 'all') {
       result = result.filter(f => f.category && f.category.toLowerCase().includes(state.categoryFilter.toLowerCase()));
@@ -616,9 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="compare-toggle-btn w-5 h-5 rounded border ${isCompared ? 'bg-blue-600 border-blue-600 text-white' : 'border-[var(--color-border-strong)] text-transparent'} flex items-center justify-center transition-all hover:border-blue-500" data-id="${fund.fund_id}" title="Add to compare">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </button>
+            ${amcLogo(fund.amc_name, 34)}
             <div class="min-w-0">
               <div class="font-bold text-[0.88rem] text-[var(--color-text)] group-hover:text-blue-400 transition-colors flex items-center gap-2">
-                <span class="truncate">${escapeHtml(fund.fund_name)}</span>
+                <span class="truncate">${escapeHtml(fund.fund_name)}</span>${verifiedBadge(fund)}
               </div>
               <div class="text-[0.72rem] text-[var(--color-text-muted)] flex items-center gap-2 mt-0.5">
                 <span>${escapeHtml(fund.amc_name || 'GIFT City Issuer')}</span>
@@ -659,21 +697,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function createFundCard(fund) {
+    const href = `/fund/${fund.fund_id}/${slugify(fund.fund_name)}`;
     return `
-      <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+      <div class="fund-card glass-card rounded-2xl p-5 flex flex-col justify-between group">
         <div>
-          <div class="flex items-start justify-between gap-2 mb-3">
-            ${flowBadgeHtml(fund, 'text-[10px] uppercase px-2 py-0.5')}
-            <span class="text-xs text-[var(--color-text-subtle)] font-mono">${fund.launch_date || 'N/A'}</span>
+          <div class="flex items-start justify-between gap-2 mb-4">
+            <a href="${href}" class="shrink-0" aria-label="${escapeHtml(fund.amc_name || 'Fund house')}">${amcLogo(fund.amc_name, 52)}</a>
+            <div class="flex flex-col items-end gap-1">
+              ${flowBadgeHtml(fund, 'text-[10px] uppercase px-2 py-0.5')}
+              ${verifiedBadge(fund)}
+              <span class="text-[11px] text-[var(--color-text-subtle)] font-mono">${fund.launch_date || 'N/A'}</span>
+            </div>
           </div>
-          <h3 class="font-bold text-sm text-[var(--color-text)] group-hover:text-blue-400 transition-colors line-clamp-2 mb-1">
-            ${escapeHtml(fund.fund_name)}
-          </h3>
-          <p class="text-xs text-[var(--color-text-muted)] mb-4">${escapeHtml(fund.amc_name || 'GIFT City AMC')}</p>
-          <div class="grid grid-cols-2 gap-2 bg-[var(--color-bg-subtle)] border border-[var(--color-border)] p-3 rounded-xl mb-4">
+          <a href="${href}" class="block">
+            <h3 class="font-bold text-[15px] leading-snug text-[var(--color-text)] group-hover:text-blue-500 transition-colors line-clamp-2">
+              ${escapeHtml(fund.fund_name)}
+            </h3>
+          </a>
+          <p class="text-xs text-[var(--color-text-muted)] mt-1 mb-4 line-clamp-1">${escapeHtml(fund.amc_name || 'GIFT City AMC')}${fund.category ? ' &middot; ' + escapeHtml(fund.category) : ''}</p>
+          <div class="grid grid-cols-2 gap-2 pt-3 border-t border-[var(--color-border)] mb-4">
             <div>
               <span class="block text-[10px] text-[var(--color-text-subtle)] uppercase">NAV</span>
-              <span class="font-mono font-bold text-sm text-emerald-400">
+              <span class="font-mono font-bold text-sm text-emerald-500">
                 ${fund.nav !== null ? `${fund.nav.toFixed(2)} ${fund.nav_currency || 'USD'}` : '—'}
               </span>
             </div>
@@ -685,9 +730,9 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-between gap-2 pt-2 border-t border-[var(--color-border)]">
-          <button class="view-detail-btn text-xs font-bold text-blue-400 hover:text-blue-300" data-id="${fund.fund_id}">View Intelligence →</button>
-          <button class="compare-toggle-btn text-xs px-2 py-1 rounded border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]" data-id="${fund.fund_id}">
+        <div class="flex items-center justify-between gap-2">
+          <button class="view-detail-btn text-xs font-bold text-blue-500 hover:text-blue-600" data-id="${fund.fund_id}">View Intelligence →</button>
+          <button class="compare-toggle-btn text-xs px-2.5 py-1 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-card-hover)]" data-id="${fund.fund_id}">
             ${state.compareIds.has(fund.fund_id) ? '✓ Compared' : '+ Compare'}
           </button>
         </div>
@@ -1729,6 +1774,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.gaTrack) window.gaTrack('Filter Used', { filter: 'flow_type', value: e.target.value });
       });
     }
+
+    // Verified / other tabs
+    document.querySelectorAll('.verified-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.verifiedTab = btn.getAttribute('data-verified-tab');
+        updateVerifiedTabs();
+        updateCategoryTabCounts();
+        applyFilters();
+        if (window.gaTrack) window.gaTrack('Filter Used', { filter: 'verified', value: state.verifiedTab });
+      });
+    });
 
     // Category filter tabs
     document.querySelectorAll('.cat-filter-btn').forEach(btn => {

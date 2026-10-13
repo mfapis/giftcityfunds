@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="/static/css/custom.css" />
   <script>
     (function () {
-      var t = localStorage.getItem('gcf-theme') || 'light';
+      var t = 'light';
       document.documentElement.classList.add(t);
       document.documentElement.classList.remove(t === 'light' ? 'dark' : 'light');
     })();
@@ -56,28 +56,19 @@
   <!-- ========================================================================= -->
   <!-- NAVIGATION BAR -->
   <!-- ========================================================================= -->
-  <nav class="sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
+  <nav class="site-nav sticky top-0 z-40 bg-[var(--color-bg-subtle)]/90 backdrop-blur-md border-b border-[var(--color-border)] px-4 md:px-8 py-3 transition-colors">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <a href="/" class="flex items-center gap-2.5 group">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="GiftCityFunds" class="h-14 w-auto">
       </a>
 
       <div class="flex items-center gap-1.5 xl:gap-2 shrink-0">
-        <a href="/insights" class="hidden sm:inline-flex items-center px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--color-text-muted)] hover:text-blue-400 transition-colors whitespace-nowrap shrink-0">Insights</a>
-        <a href="/events" class="hidden sm:inline-flex items-center px-2.5 xl:px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--color-text-muted)] hover:text-blue-400 transition-colors whitespace-nowrap shrink-0">Events</a>
+        {% include '_nav_links.html' %}
         {% include '_lead_form_button.html' %}
 
         {% include '_contact_us.html' %}
 
         {% include '_mobile_menu_button.html' %}
-        <div class="theme-switch inline-flex items-center gap-1 p-1 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] shrink-0">
-          <button type="button" id="themeToggleLight" aria-label="Light mode" class="theme-switch-btn active w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-          </button>
-          <button type="button" id="themeToggleDark" aria-label="Dark mode" class="theme-switch-btn w-7 h-7 rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-          </button>
-        </div>
 
         {# Account Area -- commented out for now, not deleted
         {% if session.user_id %}
@@ -104,9 +95,13 @@
 
     <!-- Header (full width, above both columns) -->
     <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl mb-6">
+     <div class="flex items-start gap-4 sm:gap-6">
+      <div id="fundHeaderLogo" class="shrink-0"></div>
+      <div class="min-w-0 flex-1">
       <div class="flex items-center gap-2 mb-2 flex-wrap">
         <span id="modalTierBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold">Tier 1</span>
         <span id="modalFlowBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold hidden"></span>
+        <span id="fundVerifiedBadge"></span>
         <span id="modalCategory" class="text-xs text-[var(--color-text-subtle)]">Retail Feeder Fund</span>
       </div>
       <h1 id="modalFundName" class="text-2xl md:text-3xl font-black text-[var(--color-text)]">{{ fund_name }}</h1>
@@ -125,31 +120,50 @@
           Factsheet not published
         </span>
       </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- NAV history: full width, one line per share class (Direct and Regular side by side) -->
+    <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-7 shadow-xl mb-6">
+      <div class="flex items-start justify-between gap-3 flex-wrap mb-1">
+        <div>
+          <h3 class="text-xl font-extrabold text-[var(--color-text)] tracking-tight">NAV history</h3>
+          <p class="text-xs text-[var(--color-text-subtle)] mt-0.5">Daily NAV per share class, from the fund house's own records. <span id="modalNavSubtitle"></span></p>
+        </div>
+      </div>
+      <div class="flex items-center justify-between gap-3 flex-wrap mt-4 mb-4">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" data-range="1M" class="nav-range-tab nav-pill">1M</button>
+          <button type="button" data-range="3M" class="nav-range-tab nav-pill">3M</button>
+          <button type="button" data-range="6M" class="nav-range-tab nav-pill">6M</button>
+          <button type="button" data-range="YTD" class="nav-range-tab nav-pill">YTD</button>
+          <button type="button" data-range="1Y" class="nav-range-tab nav-pill">1Y</button>
+          <button type="button" data-range="3Y" class="nav-range-tab nav-pill">3Y</button>
+          <button type="button" data-range="5Y" class="nav-range-tab nav-pill">5Y</button>
+          <button type="button" data-range="ALL" class="nav-range-tab nav-pill">All</button>
+        </div>
+        <div id="navLegend" class="flex items-center gap-2 flex-wrap"></div>
+      </div>
+      <div id="modalNavChartWrapper" class="relative w-full h-[340px] md:h-[420px]">
+        <canvas id="modalNavCanvas"></canvas>
+        <div id="navEmptyNote" class="hidden absolute inset-0 flex items-center justify-center text-center text-xs text-[var(--color-text-subtle)] px-4"></div>
+      </div>
+      <p id="navChartNote" class="mt-3 text-[11px] text-[var(--color-text-subtle)]"></p>
     </div>
 
     <div class="grid lg:grid-cols-3 gap-6 items-start">
 
       <!-- Left column: chart + all data sections -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2 space-y-6 min-w-0">
 
-        <!-- NAV Performance Chart -->
-        <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl">
-          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">NAV Performance Trajectory</h3>
-            <span id="modalNavSubtitle" class="text-[10px] text-[var(--color-text-subtle)]">Recorded NAV History</span>
+        <!-- Returns and volatility of every share class, from its daily NAV (scrolls sideways when there are many classes) -->
+        <div id="modalReturnsSection" class="hidden min-w-0 glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h3 class="text-xs font-bold text-[var(--color-text)] uppercase tracking-wider">Returns &amp; Volatility</h3>
+            <span class="text-[10px] text-[var(--color-text-subtle)]">Calculated from daily NAV</span>
           </div>
-          <div class="flex items-center gap-1 mb-3 flex-wrap">
-            <button type="button" data-range="YTD" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">YTD</button>
-            <button type="button" data-range="1M" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">1M</button>
-            <button type="button" data-range="3M" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">3M</button>
-            <button type="button" data-range="1Y" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">1Y</button>
-            <button type="button" data-range="3Y" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">3Y</button>
-            <button type="button" data-range="5Y" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">5Y</button>
-            <button type="button" data-range="ALL" class="nav-range-tab text-[10px] font-bold px-2.5 py-1 rounded-lg text-[var(--color-text-muted)] hover:text-blue-400 transition-colors">All</button>
-          </div>
-          <div id="modalNavChartWrapper" class="h-64 md:h-80 w-full bg-[var(--color-bg-subtle)] border border-[var(--color-border)] rounded-2xl p-3 relative">
-            <canvas id="modalNavCanvas"></canvas>
-          </div>
+          <div id="modalReturnsBody" class="min-w-0 bg-[var(--color-bg-subtle)] border border-[var(--color-border)] rounded-2xl p-3"></div>
         </div>
 
         <div class="glass-card border border-[var(--color-border)] rounded-3xl p-5 md:p-6 shadow-xl space-y-5">
@@ -337,6 +351,9 @@
     window.GIFT360_LOGGED_IN = {{ 'true' if session.user_id else 'false' }};
     window.GIFT_FUND_ID = {{ fund_id }};
   </script>
+  <script src="/static/js/amc_logo.js"></script>
+  <script src="/static/js/nav_chart.js"></script>
+  <script src="/static/js/returns_table.js"></script>
   <script src="/static/js/fund_detail.js"></script>
   {% include '_analytics.html' %}
   {% include '_lead_form_modal.html' %}

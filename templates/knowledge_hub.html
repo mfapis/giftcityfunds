@@ -1,0 +1,64 @@
+{% extends "base_page.html" %}
+{% block title %}Knowledge Hub{% endblock %}
+{% block description %}GIFT City IFSC regulatory 101: retail feeder funds versus institutional AIFs, why some AIFs publish no NAV, and the tax position of foreign investors.{% endblock %}
+{% block content %}
+  <!-- ========================================================================= -->
+  <!-- KNOWLEDGE HUB & IFSCA FAQ SECTION -->
+  <!-- ========================================================================= -->
+  <section id="knowledge" class="py-12 px-4 md:px-8 max-w-5xl mx-auto w-full">
+    <div class="text-center mb-8">
+      <span class="text-xs font-extrabold uppercase tracking-widest text-blue-500">Knowledge Hub</span>
+      <h2 class="text-2xl font-black text-[var(--color-text)] tracking-tight">GIFT City IFSC Regulatory 101</h2>
+      <p class="text-xs text-[var(--color-text-muted)] mt-1">Understanding the regulatory, structural, and tax advantages of investing in IFSC vehicles.</p>
+    </div>
+
+    <div class="space-y-3">
+      
+      <!-- FAQ 1 -->
+      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
+        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
+          <span>What is the difference between Retail Feeder Funds and Institutional AIFs in GIFT City?</span>
+          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
+          Retail feeder funds (such as HDFC’s Invest in India share classes) allow global retail investors to invest with smaller ticket sizes ($500+) and publish regular daily USD NAVs. In contrast, Category II and III Alternative Investment Funds (AIFs) are institutional structures with a mandatory minimum investment ticket of <strong>$150,000 USD</strong>, tailored for HNIs, family offices, and institutions.
+        </div>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
+        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
+          <span>Why do several institutional AIFs have NULL public NAVs?</span>
+          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
+          Under statutory IFSCA regulations, private AIFs are not legally required to publish open public NAVs on distributor websites. Instead, NAV statements, capital call accounts, and portfolio performance are distributed privately to registered unit holders. Our platform transparently documents this statutory standard rather than using fabricated figures.
+        </div>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="glass-card rounded-2xl border border-[var(--color-border)] overflow-hidden">
+        <button class="accordion-toggle w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-sm text-[var(--color-text)] hover:text-blue-400 transition-colors">
+          <span>What tax advantages apply to foreign investors allocating to GIFT City funds?</span>
+          <svg class="accordion-arrow w-4 h-4 shrink-0 transition-transform text-[var(--color-text-subtle)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="p-4 pt-0 text-xs text-[var(--color-text-muted)] leading-relaxed border-t border-[var(--color-border)]/50">
+          Non-resident investors in GIFT City IFSC enjoy a 100% tax exemption on capital gains arising from the transfer of offshore securities, zero GST on fund management fees, and simplified non-PAN tax compliance under Section 47 and Section 10(4D) of the Indian Income Tax Act.
+        </div>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}
+{% block scripts %}
+  <script>
+    document.querySelectorAll('.accordion-toggle').forEach(function (header) {
+      header.addEventListener('click', function () {
+        var content = header.nextElementSibling;
+        var arrow = header.querySelector('.accordion-arrow');
+        content.classList.toggle('hidden');
+        if (arrow) arrow.classList.toggle('rotate-180');
+      });
+    });
+  </script>
+{% endblock %}
