@@ -1,5 +1,5 @@
 {
-  "_note": "The funds whose data has been checked field by field against the fund house's latest factsheet and notices (NAV history, TER, minimum investment, exit load, benchmark, holdings and allocations). A fund counts as verified only when its id AND its name both match, so a fund that is deleted and re-created under the same id is not carried over. Add a fund here only after that check. Fund 180 (Altus) is verified against its weekly factsheets: all 66 weeks of NAV read and cross-checked, terms from its Fund Facts page; its benchmark, which no factsheet states, is cleared.",
+  "_note": "The funds whose data has been checked field by field against the fund house's latest factsheet and notices (NAV history, TER, minimum investment, exit load, benchmark, holdings and allocations). A fund counts as verified only when its id AND its name both match, so a fund that is deleted and re-created under the same id is not carried over. Add a fund here only after that check. Fund 180 (Altus) is verified against its weekly factsheets: all 66 weeks of NAV read and cross-checked, terms from its Fund Facts page; its benchmark, which no factsheet states, is cleared. Fund 9 (Baroda BNP Paribas GIFT US Small Cap) is verified against Baroda's own NAV archive (3 classes, subscription and redemption NAV) and its class structure table; its fund manager, which Baroda's pages do not name, is cleared. Its holdings and sectors are the underlying fund's and about a year old.",
   "verified_as_of": "2026-10-12",
   "basis": "Latest factsheets and notices published by each fund house",
   "funds": [
@@ -62,6 +62,10 @@
     {
       "id": 180,
       "name": "Quant Algorithmic Strategies Fund"
+    },
+    {
+      "id": 9,
+      "name": "Baroda BNP Paribas GIFT US Small Cap Fund"
     }
   ]
 }
