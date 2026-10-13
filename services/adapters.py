@@ -276,6 +276,8 @@ def nav_history(fund: Dict[str, Any]) -> List[Dict[str, Any]]:
         {
             "nav_date": _date(p.get("nav_date")),
             "nav": _num(p.get("nav")),
+            # the redemption NAV where the fund publishes one apart from the subscription NAV (None otherwise)
+            "redemption_nav": _num(p.get("redemption_nav")),
             # the share class the NAV belongs to: the returns table is calculated per class (None = an old one-off snapshot)
             "share_class": p.get("share_class"),
             "nav_currency": fund.get("base_currency") or "USD",

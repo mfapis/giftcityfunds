@@ -11,6 +11,7 @@
   const COLORS = { direct: '#38bdf8', regular: '#f59e0b' };   // Direct keeps the cyan-blue the NAV line always had
   const EXTRA = ['#10b981', '#e11d48', '#7c3aed', '#0891b2', '#64748b', '#d946ef'];
   let selected = null;                      // share class being viewed; kept across range changes
+  let navType = 'subscription';            // 'subscription' or 'redemption' NAV (only offered when the fund publishes both)
   let chart = null;
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -21,11 +22,16 @@
     return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}${withYear ? ' ' + d.getUTCFullYear() : ''}`;
   };
 
-  /** [{label, points: [{x, y}]}] with Direct first, Regular second, then the rest as listed. */
-  function seriesOf(history) {
+  /** True when any row carries a redemption NAV that differs from its subscription NAV (DSP publishes the same figure for both: no switch). */
+  function hasRedemption(history) {
+    return (history || []).some((r) => r.redemption_nav != null && Number(r.redemption_nav) > 0 && Number(r.redemption_nav) !== Number(r.nav));
+  }
+
+  /** [{label, points: [{x, y}]}] with Direct first, Regular second, then the rest as listed. type: 'subscription' (the NAV) or 'redemption'. */
+  function seriesOf(history, type = 'subscription') {
     const by = new Map();
     for (const row of history || []) {
-      const y = Number(row.nav), x = day(row.nav_date);
+      const y = Number(type === 'redemption' ? row.redemption_nav : row.nav), x = day(row.nav_date);
       if (!Number.isFinite(y) || y <= 0 || !Number.isFinite(x)) continue;
       const label = row.share_class || 'NAV';
       if (!by.has(label)) by.set(label, new Map());
@@ -69,7 +75,9 @@
     if (!canvas) return false;
     if (chart) { chart.destroy(); chart = null; }
 
-    const all = seriesOf(history);
+    const redemptionAvailable = hasRedemption(history);
+    if (!redemptionAvailable) navType = 'subscription';
+    const all = seriesOf(history, navType);
     if (!all.length) { canvas.style.display = 'none'; if (legend) legend.innerHTML = ''; if (note) note.textContent = ''; return false; }
     canvas.style.display = '';
 
@@ -89,19 +97,27 @@
       const p = chosen.points;
       const change = p.length > 1 ? (p[p.length - 1].y / p[0].y - 1) * 100 : null;
       const stat = change === null ? '' : `<span class="nav-legend-stat"><b style="color:${change >= 0 ? '#059669' : '#dc2626'}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</b> <span class="nav-legend-sub">${rangeName}</span></span>`;
+      const classWord = shown.some((s) => /direct|regular/i.test(s.label)) ? 'Plan' : 'Class';
+      const typeSwitch = redemptionAvailable
+        ? `<span class="nav-legend-sub" style="font-weight:700">NAV</span><span class="nav-plan-switch">${['subscription', 'redemption'].map((t) => `<button type="button" class="nav-type-btn nav-plan-btn ${t === navType ? 'is-active' : ''}" data-type="${t}">${t === 'subscription' ? 'Subscription' : 'Redemption'}</button>`).join('')}</span>`
+        : '';
       const picker = shown.length > 1
-        ? `<span class="nav-legend-sub" style="font-weight:700">Plan</span><span class="nav-plan-switch">${shown.map((s) => `<button type="button" class="nav-plan-btn ${s === chosen ? 'is-active' : ''}" data-class="${esc(s.label)}">${esc(s.label)}</button>`).join('')}</span>`
+        ? `<span class="nav-legend-sub" style="font-weight:700">${classWord}</span><span class="nav-plan-switch">${shown.map((s) => `<button type="button" class="nav-plan-btn ${s === chosen ? 'is-active' : ''}" data-class="${esc(s.label)}">${esc(s.label)}</button>`).join('')}</span>`
         : `<span class="nav-legend-name">${esc(chosen.label)}</span>`;
-      legend.innerHTML = picker + stat;
-      legend.querySelectorAll('.nav-plan-btn').forEach((b) => b.addEventListener('click', () => {
+      legend.innerHTML = typeSwitch + picker + stat;
+      legend.querySelectorAll('.nav-plan-btn[data-class]').forEach((b) => b.addEventListener('click', () => {
         selected = b.getAttribute('data-class');
+        render(opts);
+      }));
+      legend.querySelectorAll('.nav-type-btn').forEach((b) => b.addEventListener('click', () => {
+        navType = b.getAttribute('data-type');
         render(opts);
       }));
     }
 
     if (note) {
       const s = chosen;
-      note.textContent = `${s.label}: ${s.points.length} daily NAV${s.points.length === 1 ? '' : 's'}${s.points.length ? `, ${fmtDay(s.points[0].x, true)} to ${fmtDay(s.points[s.points.length - 1].x, true)}` : ''}`;
+      note.textContent = `${s.label}${redemptionAvailable ? ` (${navType} NAV)` : ''}: ${s.points.length} daily NAV${s.points.length === 1 ? '' : 's'}${s.points.length ? `, ${fmtDay(s.points[0].x, true)} to ${fmtDay(s.points[s.points.length - 1].x, true)}` : ''}`;
     }
     if (!visible.length) { canvas.style.display = 'none'; return false; }
 
@@ -141,7 +157,7 @@
             backgroundColor: isLight ? '#0f172a' : '#1e293b', padding: 10, titleColor: '#fff', bodyColor: '#e2e8f0',
             callbacks: {
               title: (items) => (items.length ? fmtDay(items[0].parsed.x, true) : ''),
-              label: (item) => ` ${item.dataset.label}: ${item.parsed.y.toFixed(4)} ${currency}`,
+              label: (item) => ` ${item.dataset.label}${redemptionAvailable ? ' ' + navType : ''}: ${item.parsed.y.toFixed(4)} ${currency}`,
             },
           },
         },
@@ -158,5 +174,5 @@
     return true;
   }
 
-  window.NavChart = { render, seriesOf };
+  window.NavChart = { render, seriesOf, hasRedemption };
 })();
