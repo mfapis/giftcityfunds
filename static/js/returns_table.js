@@ -165,7 +165,7 @@
         <table style="border-collapse:collapse;min-width:100%;font-size:12px">
           <thead><tr><th style="${sticky}">Share class</th>${m.classes.map((c) => `<th ${th}>${esc(c)}</th>`).join('')}</tr></thead>
           <tbody>
-            ${info('Inception date', perClass((x) => (x.first ? x.first.date : '-')))}
+            ${info('Inception date', perClass((x) => (meta && meta.inceptionDate) || (x.first ? x.first.date : '-')))}
             ${meta && meta.category ? info('Category', one(meta.category)) : ''}
             ${aum ? info('AUM', one(aum)) : ''}
             ${info('Performance as on', perClass((x) => (x.last ? x.last.date : '-')))}
