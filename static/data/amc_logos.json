@@ -1,30 +1,200 @@
 {
   "_note": "AMC logo per fund house. A logo is used when every word of a 'match' entry appears in the AMC name (case-insensitive); the first matching entry wins, so list the more specific names first. A logo marked wide (a wordmark rather than a square mark) gets a wider tile. AMCs without an entry show their initials.",
   "logos": [
-    { "match": ["altus"], "file": "altus.png", "wide": true },
-    { "match": ["baroda", "bnp"], "file": "baroda-bnp-paribas.png" },
-    { "match": ["hdfc"], "file": "hdfc.png" },
-    { "match": ["dsp"], "file": "dsp.png" },
-    { "match": ["ppfas"], "file": "ppfas.png" },
-    { "match": ["parag", "parikh"], "file": "ppfas.png" },
-    { "match": ["sundaram"], "file": "sundaram.png" },
-    { "match": ["tata"], "file": "tata.png" },
-    { "match": ["edelweiss"], "file": "edelweiss.png" },
-    { "match": ["bandhan"], "file": "bandhan.png" },
-    { "match": ["kotak"], "file": "kotak.png" },
-    { "match": ["aditya", "birla"], "file": "aditya-birla.png" },
-    { "match": ["absl"], "file": "aditya-birla.png" },
-    { "match": ["uti"], "file": "uti.png" },
-    { "match": ["whiteoak"], "file": "whiteoak.png" },
-    { "match": ["axis"], "file": "axis.png" },
-    { "match": ["mirae"], "file": "mirae.png" },
-    { "match": ["nj", "asset"], "file": "nj.png" },
-    { "match": ["sbi"], "file": "sbi.png" },
-    { "match": ["unifi"], "file": "unifi.png" },
-    { "match": ["quant"], "file": "quant.png" },
-    { "match": ["mo", "alternative"], "file": "motilal-oswal.png" },
-    { "match": ["motilal"], "file": "motilal-oswal.png" },
-    { "match": ["360"], "file": "360-one.png" },
-    { "match": ["icici"], "file": "icici-prudential.png" }
+    {
+      "match": [
+        "abc",
+        "wealth"
+      ],
+      "file": "abc-wealth.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "baroda",
+        "bnp"
+      ],
+      "file": "baroda-bnp-paribas.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "parag",
+        "parikh"
+      ],
+      "file": "ppfas.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "aditya",
+        "birla"
+      ],
+      "file": "aditya-birla.png"
+    },
+    {
+      "match": [
+        "nj",
+        "asset"
+      ],
+      "file": "nj.png"
+    },
+    {
+      "match": [
+        "mo",
+        "alternative"
+      ],
+      "file": "motilal-oswal.png"
+    },
+    {
+      "match": [
+        "carnelian"
+      ],
+      "file": "carnelian.png"
+    },
+    {
+      "match": [
+        "nippon"
+      ],
+      "file": "nippon.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "marcellus"
+      ],
+      "file": "marcellus.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "altus"
+      ],
+      "file": "altus.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "hdfc"
+      ],
+      "file": "hdfc.png"
+    },
+    {
+      "match": [
+        "dsp"
+      ],
+      "file": "dsp.png"
+    },
+    {
+      "match": [
+        "ppfas"
+      ],
+      "file": "ppfas.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "sundaram"
+      ],
+      "file": "sundaram.png"
+    },
+    {
+      "match": [
+        "tata"
+      ],
+      "file": "tata.png"
+    },
+    {
+      "match": [
+        "edelweiss"
+      ],
+      "file": "edelweiss.png",
+      "wide": true
+    },
+    {
+      "match": [
+        "bandhan"
+      ],
+      "file": "bandhan.png"
+    },
+    {
+      "match": [
+        "kotak"
+      ],
+      "file": "kotak.png"
+    },
+    {
+      "match": [
+        "absl"
+      ],
+      "file": "aditya-birla.png"
+    },
+    {
+      "match": [
+        "uti"
+      ],
+      "file": "uti.png"
+    },
+    {
+      "match": [
+        "whiteoak"
+      ],
+      "file": "whiteoak.png"
+    },
+    {
+      "match": [
+        "axis"
+      ],
+      "file": "axis.png"
+    },
+    {
+      "match": [
+        "mirae"
+      ],
+      "file": "mirae.png"
+    },
+    {
+      "match": [
+        "sbi"
+      ],
+      "file": "sbi.png"
+    },
+    {
+      "match": [
+        "unifi"
+      ],
+      "file": "unifi.png"
+    },
+    {
+      "match": [
+        "quant"
+      ],
+      "file": "quant.png"
+    },
+    {
+      "match": [
+        "motilal"
+      ],
+      "file": "motilal-oswal.png"
+    },
+    {
+      "match": [
+        "360"
+      ],
+      "file": "360-one.png"
+    },
+    {
+      "match": [
+        "icici"
+      ],
+      "file": "icici-prudential.png"
+    },
+    {
+      "match": [
+        "ask"
+      ],
+      "file": "ask.png",
+      "wide": true
+    }
   ]
 }
