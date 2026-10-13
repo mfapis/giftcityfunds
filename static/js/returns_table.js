@@ -165,7 +165,7 @@
         <table style="border-collapse:collapse;min-width:100%;font-size:12px">
           <thead><tr><th style="${sticky}">Share class</th>${m.classes.map((c) => `<th ${th}>${esc(c)}</th>`).join('')}</tr></thead>
           <tbody>
-            ${info('Inception date', perClass((x) => (x.first ? x.first.date : '-')))}
+            ${info('Inception date', perClass((x) => (meta && meta.inceptionDate) || (x.first ? x.first.date : '-')))}
             ${meta && meta.category ? info('Category', one(meta.category)) : ''}
             ${aum ? info('AUM', one(aum)) : ''}
             ${info('Performance as on', perClass((x) => (x.last ? x.last.date : '-')))}
@@ -214,27 +214,27 @@
   function renderComparison(container, funds, plan) {
     const m = buildComparison(funds, plan);
     if (!m.columns.length) return false;
-    const NAVY = '#16168a', W1 = 128, W2 = 118;
+    const NAVY = '#16168a';                                  // widths, font and padding come from CSS variables so a phone gets a tighter table
     const nav = (extra = '') => `background:${NAVY};color:#fff;${extra}`;
-    const stick1 = (extra = '') => `position:sticky;left:0;z-index:2;width:${W1}px;min-width:${W1}px;max-width:${W1}px;${extra}`;
-    const stick2 = (extra = '') => `position:sticky;left:${W1}px;z-index:2;width:${W2}px;min-width:${W2}px;${extra}`;
-    const cell = 'padding:8px 10px;text-align:center;min-width:104px;font-weight:600;border:2px solid #fff';
-    const lab = (extra = '') => `padding:8px 10px;font-weight:700;border:2px solid #fff;${extra}`;
+    const stick1 = (extra = '') => `position:sticky;left:0;z-index:2;width:var(--rt-w1);min-width:var(--rt-w1);max-width:var(--rt-w1);${extra}`;
+    const stick2 = (extra = '') => `position:sticky;left:var(--rt-w1);z-index:2;width:var(--rt-w2);min-width:var(--rt-w2);${extra}`;
+    const cell = 'padding:var(--rt-pad);text-align:center;min-width:var(--rt-col);font-weight:600;border:2px solid #fff';
+    const lab = (extra = '') => `padding:var(--rt-pad);font-weight:700;border:2px solid #fff;${extra}`;
     const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    const head = m.columns.map((c) => `<th style="${nav(cell + ';font-size:12px;vertical-align:top')}">
+    const head = m.columns.map((c) => `<th style="${nav(cell + ';vertical-align:top;line-height:1.2;font-size:calc(var(--rt-font) - 0.5px)')}">
         <a href="/fund/${esc(c.fund.fund_id)}/${esc(slug(c.fund.fund_name))}" style="color:#fff;text-decoration:none" title="${esc(c.fund.fund_name)}">${esc(c.fund.fund_name)}</a>
         <div style="font-weight:400;font-size:10px;opacity:.85;margin-top:2px">${esc(c.fund.amc_name || '')}${c.classLabel ? ` &middot; ${esc(c.classLabel)}` : ''}</div></th>`).join('');
     const navyRow = (label, cellsHtml, sub) => `<tr><td colspan="2" style="${stick1(nav(lab()))}"><span style="display:block">${label}</span>${sub ? `<span style="font-weight:400;font-size:10px;opacity:.85">${sub}</span>` : ''}</td>${cellsHtml}</tr>`;
     const infoCells = (fn) => m.columns.map((c) => `<td style="${nav(cell)}">${fn(c)}</td>`).join('');
     const dataBlock = (title, rows, kind) => rows.map((r, i) => `<tr>
-        ${i === 0 ? `<td rowspan="${rows.length}" style="${stick1(`background:#eaf1e6;color:#3b5a2f;text-align:center;vertical-align:middle;${lab()}`)}">${title}</td>` : ''}
+        ${i === 0 ? `<td rowspan="${rows.length}" style="${stick1(`background:#eaf1e6;color:#3b5a2f;text-align:center;vertical-align:middle;font-size:max(8px,calc(var(--rt-font) - 2px));overflow-wrap:anywhere;hyphens:none;${lab()}`)}">${title}</td>` : ''}
         <td style="${stick2(`background:#fff;${lab('color:#111')}`)}">${esc(r.label)}</td>
         ${r.values.map((v) => `<td style="${cell};${heat(v, r.values, kind) || 'background:#fff;color:#111'}">${pct(v)}</td>`).join('')}</tr>`).join('');
     container.innerHTML = `
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;border:1px solid var(--color-border,#e2e8f0)">
-        <table style="border-collapse:separate;border-spacing:0;font-size:12px;min-width:100%;background:#fff">
+        <table style="border-collapse:separate;border-spacing:0;font-size:var(--rt-font);min-width:100%;background:#fff">
           <thead><tr>
-            <th style="${stick1(nav(lab('text-align:center;vertical-align:middle')))}">Performance &ndash; ${esc(plan)}</th>
+            <th style="${stick1(nav(lab('text-align:center;vertical-align:middle;font-size:calc(var(--rt-font) - 1px)')))}">Performance &ndash; ${esc(plan)}</th>
             <th style="${stick2(nav(lab('text-align:center')))}">Period</th>${head}</tr></thead>
           <tbody>
             ${navyRow('Inception Date', infoCells((c) => fmtDate(c.fund.inception_date || (c.metrics.first && c.metrics.first.date))))}

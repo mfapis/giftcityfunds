@@ -1,5 +1,5 @@
 {
-  "_note": "The funds whose data has been checked field by field against the fund house's latest factsheet and notices (NAV history, TER, minimum investment, exit load, benchmark, holdings and allocations). A fund counts as verified only when its id AND its name both match, so a fund that is deleted and re-created under the same id is not carried over. Add a fund here only after that check.",
+  "_note": "The funds whose data has been checked field by field against the fund house's latest factsheet and notices (NAV history, TER, minimum investment, exit load, benchmark, holdings and allocations). A fund counts as verified only when its id AND its name both match, so a fund that is deleted and re-created under the same id is not carried over. Add a fund here only after that check. Fund 180 (Altus) is verified against its weekly factsheets: all 66 weeks of NAV read and cross-checked, terms from its Fund Facts page; its benchmark, which no factsheet states, is cleared.",
   "verified_as_of": "2026-10-12",
   "basis": "Latest factsheets and notices published by each fund house",
   "funds": [
@@ -58,6 +58,10 @@
     {
       "id": 169,
       "name": "Tata India Dynamic Equity Fund"
+    },
+    {
+      "id": 180,
+      "name": "Quant Algorithmic Strategies Fund"
     }
   ]
 }

@@ -862,7 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.getElementById('modalReturnsBody');
     if (!section || !body || !window.ReturnsTable) return;
     const shown = window.ReturnsTable.render(body, history, {
-      category: f.category, aum: f.aum, aumCurrency: f.aum_currency, aumDate: f.aum_date,
+      category: f.category, inceptionDate: f.launch_date || f.inception_date, aum: f.aum, aumCurrency: f.aum_currency, aumDate: f.aum_date,
     });
     section.classList.toggle('hidden', !shown);
   }

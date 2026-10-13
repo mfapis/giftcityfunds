@@ -38,10 +38,12 @@
     return list.sort((a, b) => rank(a.label) - rank(b.label));
   }
 
-  function colourFor(label, index) {
+  // Direct and Regular keep their own colours; any other class (a fund with one unit class, HDFC India's Class A1, ...) takes the main colour
+  // first and the extra palette after that. `other` counts the classes that are neither Direct nor Regular, in order.
+  function colourFor(label, other) {
     if (/direct/i.test(label)) return COLORS.direct;
     if (/regular/i.test(label)) return COLORS.regular;
-    return EXTRA[index % EXTRA.length];
+    return other === 0 ? COLORS.direct : EXTRA[(other - 1) % EXTRA.length];
   }
 
   function cutoffFor(range, lastMs) {
@@ -73,8 +75,9 @@
 
     const lastMs = Math.max(...all.map((s) => s.points[s.points.length - 1].x));
     const from = cutoffFor(range, lastMs);
-    const shown = all.map((s, i) => ({
-      label: s.label, colour: colourFor(s.label, i - 2), full: s.points,
+    let others = 0;
+    const shown = all.map((s) => ({
+      label: s.label, colour: colourFor(s.label, /direct|regular/i.test(s.label) ? -1 : others++), full: s.points,
       points: s.points.filter((p) => p.x >= from),
     }));
     // One share class at a time, picked with the Plan switch (Direct is first when the fund has it).

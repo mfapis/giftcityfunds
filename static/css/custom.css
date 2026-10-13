@@ -788,3 +788,9 @@ input, select { border-radius: 12px; }
 .verified-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; letter-spacing: .02em; padding: 2px 8px; border-radius: 999px; color: #047857; background: rgba(16, 185, 129, .12); border: 1px solid rgba(16, 185, 129, .3); white-space: nowrap; }
 .verified-badge svg { width: 12px; height: 12px; }
 .unverified-badge { display: inline-flex; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: var(--color-text-subtle); background: var(--color-bg-subtle); border: 1px dashed var(--color-border-strong); }
+.amc-logo-wide.amc-logo-lg img { width: auto !important; height: auto !important; max-width: 88%; max-height: 72%; }
+
+/* Returns comparison table: sizes the JS reads (see returns_table.js renderComparison). Phones get narrower label columns, smaller type and tighter cells
+   so more than one fund shows at a time. */
+:root { --rt-w1: 128px; --rt-w2: 118px; --rt-col: 104px; --rt-font: 12px; --rt-pad: 8px 10px; }
+@media (max-width: 640px) { :root { --rt-w1: 76px; --rt-w2: 70px; --rt-col: 104px; --rt-font: 11px; --rt-pad: 6px 5px; } }
