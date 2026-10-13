@@ -788,3 +788,4 @@ input, select { border-radius: 12px; }
 .verified-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; letter-spacing: .02em; padding: 2px 8px; border-radius: 999px; color: #047857; background: rgba(16, 185, 129, .12); border: 1px solid rgba(16, 185, 129, .3); white-space: nowrap; }
 .verified-badge svg { width: 12px; height: 12px; }
 .unverified-badge { display: inline-flex; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: var(--color-text-subtle); background: var(--color-bg-subtle); border: 1px dashed var(--color-border-strong); }
+.amc-logo-wide.amc-logo-lg img { width: auto !important; height: auto !important; max-width: 88%; max-height: 72%; }

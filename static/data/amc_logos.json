@@ -1,6 +1,7 @@
 {
-  "_note": "AMC logo per fund house. A logo is used when every word of a 'match' entry appears in the AMC name (case-insensitive); the first matching entry wins, so list the more specific names first. AMCs without an entry show their initials.",
+  "_note": "AMC logo per fund house. A logo is used when every word of a 'match' entry appears in the AMC name (case-insensitive); the first matching entry wins, so list the more specific names first. A logo marked wide (a wordmark rather than a square mark) gets a wider tile. AMCs without an entry show their initials.",
   "logos": [
+    { "match": ["altus"], "file": "altus.png", "wide": true },
     { "match": ["baroda", "bnp"], "file": "baroda-bnp-paribas.png" },
     { "match": ["hdfc"], "file": "hdfc.png" },
     { "match": ["dsp"], "file": "dsp.png" },
